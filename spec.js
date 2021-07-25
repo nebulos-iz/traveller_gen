@@ -8,7 +8,6 @@
  * r: always runs 
  */
 
-const skillSets = ["Personal Development", "Service Skills", "Advanced Education", "Assignment"];
 const Term = {
   label: "New Term",
   type: "set",
@@ -30,9 +29,7 @@ const Term = {
     state => {},
   ],
   r: () => {},
-  debug: true,
 };
-
 
 const DrifterOrDraft = {
 	label: "Drifter or Draft",
@@ -40,7 +37,7 @@ const DrifterOrDraft = {
   v: ["Drifter", "Draft"],
   p: [state => 0.5, state => 0.5],
   o: [
-  	state => enqueue(state, TODO("Drifter")),
+  	state => enqueue(state, DrifterAssignment),
     state => enqueue(state, TODO("Draft")),
   ],
   r: () => {},  

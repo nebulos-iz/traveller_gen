@@ -1,3 +1,4 @@
+const skillSets = ["Personal Development", "Service Skills", "Advanced Education", "Assignment"];
 function chooseSkill(label, skills) {
   return uniform({
     label: label,
@@ -71,12 +72,12 @@ function TODO(label = "TODO") {
   }
 }
 
-function chooseAssignment(career, assignments, ranks, survival) {
+function assignment(career, assignments, ranks, survival) {
 	return uniform({
     label: career + " Assignment",
     type: "set",
-    v: agentAssignments,
-    o: agentAssignments.map(x => state => {
+    v: assignments,
+    o: assignments.map(x => state => {
       append(state, "Careers", career + "/" + x);
       state.set(`_${currentCareer(state)}_Terms`, 0);
       state.set(`_${currentCareer(state)}_Rank`, 0);
@@ -91,13 +92,13 @@ function chooseAssignment(career, assignments, ranks, survival) {
   });
 }
 
-function survival(assignments, stats, values) {
+function survival(career, assignments, stats, values, events, advancement) {
 	function getCheck(state) {
   	const idx = assignments.indexOf(currentAssignment(state));
     return check2d6(values[idx] - mod(state.get(stats[idx])));
   }
   return {
-    label: "Survival",
+    label:  career + "Survival",
     type: "set",
     v: ["Failure", "Success"],
     p: [
@@ -111,8 +112,8 @@ function survival(assignments, stats, values) {
       },
       state => {
         incr(state, `_${currentCareer(state)}_Terms`);
-        enqueue(state, AgentEvents);
-        enqueue(state, AgentAdvancement)
+        enqueue(state, events);
+        enqueue(state, advancement)
       }
     ],
     r: () => {},
@@ -173,6 +174,5 @@ function getBenefits(state) {
   const numBenefits = terms + rankBonus;
   const set = rewardSet(agentCash, agentBenefits);
   const benefitRoll = rank >= 5 ? set[1] : set[0]; 
-  console.log(numBenefits);
   [...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
 }

@@ -39,48 +39,6 @@ const agentRanks = {
   },
 };
 
-const AgentEntry = {
-  label: "Agent Qualification",
-  type: "set",
-  v: ["Failed", "Succeeded"],
-  p: [
-    state => 1 - check2d6(6 - mod(state.get("INT"))),
-    state => check2d6(6 - mod(state.get("INT"))),
-  ],
-  o: [
-    state => enqueue(state, DrifterOrDraft),
-    state => {
-    	console.log(state.get("Careers").length, "asdf");
-      if (state.get("Careers").length == 0) {
-        agentSkills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
-      } else {
-        enqueue(state, AgentBasicTraining);
-      }
-      enqueue(state, AgentAssignment);
-    },
-  ],
-  r: () => {},
-};
-const AgentSurvival = survival(agentAssignments, ["END", "INT", "INT"], [6, 7, 5])
-const AgentAssignment = chooseAssignment("Agent", agentAssignments, agentRanks, AgentSurvival);
-const AgentBasicTraining = chooseSkill("Agent Basic Training", agentSkills['Service Skills']);
-const AgentAdvancement = advancement(agentAssignments, ["INT", "INT", "INT"], [6, 5, 7]);
-
-
-const AgentSkillSet = {
-  label: "Skill Set",
-  type: "set",
-  v: skillSets,
-  p: skillSets.map(set => set == "Advanced Education" ?
-    state => state.get("EDU") >= 8 ? 1 : 0 :
-    state => 1),
-  o: skillSets.map(set => set == "Assignment" ?
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[currentAssignment(state)]), true) :
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[set]), true)),
-
-  r: () => {},
-}
-
 const AgentEvents = {
   label: "Agent Events",
   type: "set",
@@ -102,3 +60,44 @@ const AgentEvents = {
   }, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
   r: () => {},
 }
+const AgentAdvancement = advancement(agentAssignments, ["INT", "INT", "INT"], [6, 5, 7]);
+const AgentEntry = {
+  label: "Agent Qualification",
+  type: "set",
+  v: ["Failed", "Succeeded"],
+  p: [
+    state => 1 - check2d6(6 - mod(state.get("INT"))),
+    state => check2d6(6 - mod(state.get("INT"))),
+  ],
+  o: [
+    state => enqueue(state, DrifterOrDraft),
+    state => {
+      if (state.get("Careers").length == 0) {
+        agentSkills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
+      } else {
+        enqueue(state, AgentBasicTraining);
+      }
+      enqueue(state, AgentAssignment);
+    },
+  ],
+  r: () => {},
+};
+const AgentSurvival = survival("Agent", agentAssignments, ["END", "INT", "INT"], [6, 7, 5], AgentEntry, AgentAdvancement)
+const AgentAssignment = assignment("Agent", agentAssignments, agentRanks, AgentSurvival);
+const AgentBasicTraining = chooseSkill("Agent Basic Training", agentSkills['Service Skills']);
+
+
+const AgentSkillSet = {
+  label: "Skill Set",
+  type: "set",
+  v: skillSets,
+  p: skillSets.map(set => set == "Advanced Education" ?
+    state => state.get("EDU") >= 8 ? 1 : 0 :
+    state => 1),
+  o: skillSets.map(set => set == "Assignment" ?
+    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[currentAssignment(state)]), true) :
+    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[set]), true)),
+
+  r: () => {},
+}
+

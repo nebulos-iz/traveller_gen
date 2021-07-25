@@ -1,5 +1,5 @@
 const drifterAssignments = ["Barbarian", "Wanderer", "Scavenger"];
-const driterRanks = {
+const drifterRanks = {
 	"Barbarian": {
     0: tb(),
     1: tb("", "Survival 1"),
@@ -28,5 +28,5 @@ const driterRanks = {
     6: tb(),
   },
 };
-//const DrifterAssignment = assignments("Drifter", drifterAssignments, drifterRanks)
-
+const DrifterSurvival = survival("Drifter", drifterAssignments, ['END', 'END', 'END'], [7, 7, 7], TODO("DrifterEvents"), TODO("DrifterAdvancement"));
+const DrifterAssignment = assignment("Drifter", drifterAssignments, drifterRanks, DrifterSurvival)
