@@ -72,33 +72,33 @@ function TODO(label = "TODO") {
   }
 }
 
-function assignment(career, assignments, ranks, survival) {
+function assignment(Career) {
 	return uniform({
-    label: career + " Assignment",
+    label: Career.name + " Assignment",
     type: "set",
-    v: assignments,
-    o: assignments.map(x => state => {
-      append(state, "Careers", career + "/" + x);
+    v: Career.assignments,
+    o: Career.assignments.map(x => state => {
+      append(state, "Careers", Career.name + "/" + x);
       state.set(`_${currentCareer(state)}_Terms`, 0);
       state.set(`_${currentCareer(state)}_Rank`, 0);
-      const title = ranks[x][state.get(`_${currentCareer(state)}_Rank`)].title;
+      const title = Career.ranks[x][state.get(`_${currentCareer(state)}_Rank`)].title;
       if (title != "") {
         state.set(`${currentCareer(state)} Title`, );
-
       }
-      enqueue(state, survival);
+      enqueue(state, Career.Survival);
     }),
     r: state => {},
   });
 }
 
-function survival(career, assignments, stats, values, events, advancement) {
+function survival(Career) {
 	function getCheck(state) {
-  	const idx = assignments.indexOf(currentAssignment(state));
-    return check2d6(values[idx] - mod(state.get(stats[idx])));
+  	const idx = Career.assignments.indexOf(currentAssignment(state));
+    return check2d6(Career.survival.values[idx] 
+			- mod(state.get(Career.survival.stats[idx])));
   }
   return {
-    label:  career + "Survival",
+    label: Career.name + "Survival",
     type: "set",
     v: ["Failure", "Success"],
     p: [
@@ -112,26 +112,27 @@ function survival(career, assignments, stats, values, events, advancement) {
       },
       state => {
         incr(state, `_${currentCareer(state)}_Terms`);
-        enqueue(state, events);
-        enqueue(state, advancement)
+        enqueue(state, Career.Events);
+        enqueue(state, Career.Advancement)
       }
     ],
     r: () => {},
   }
 }
 
-function advancement(assignments, stats, values) {
+function advancement(Career, assignments, stats, values) {
   function getCheck(state) {
-  	const idx = assignments.indexOf(currentAssignment(state));
-    return check2d6(values[idx] - mod(state.get(stats[idx])));
+  	const idx = Career.assignments.indexOf(currentAssignment(state));
+    return check2d6(Career.advancement.values[idx] 
+			- mod(state.get(Career.advancement.stats[idx])));
   }
   function advancementSuccess(state) {
     const asgn = currentAssignment(state);
     incr(state, `_${currentCareer(state)}_Rank`);
-    const rankData = agentRanks[asgn][state.get(`_${currentCareer(state)}_Rank`)];
+    const rankData = Career.ranks[asgn][state.get(`_${currentCareer(state)}_Rank`)];
     state.set(currentCareer(state) + " Title", rankData.title);
     parseSkill(rankData.bonus)(state);
-    enqueue(state, AgentSkillSet, true);
+    enqueue(state, Career.SkillSet, true);
   }
   return {
     label: "Advancement",
@@ -172,7 +173,7 @@ function getBenefits(state) {
   const rank = state.get(`_${currentCareer(state)}_Rank`);
   const rankBonus = Math.ceil(rank / 2);
   const numBenefits = terms + rankBonus;
-  const set = rewardSet(agentCash, agentBenefits);
+  const set = rewardSet(Agent.cash, Agent.benefits);
   const benefitRoll = rank >= 5 ? set[1] : set[0]; 
   [...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
 }

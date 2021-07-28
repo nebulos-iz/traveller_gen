@@ -25,7 +25,7 @@ const Term = {
     state => enqueue(state, ArmyAcademyEntry),
     state => enqueue(state, MarineAcademyEntry),
     state => enqueue(state, NavyAcademyEntry),
-    state => enqueue(state, AgentEntry),
+    state => enqueue(state, Agent.Entry),
     state => {},
   ],
   r: () => {},
@@ -37,7 +37,7 @@ const DrifterOrDraft = {
   v: ["Drifter", "Draft"],
   p: [state => 0.5, state => 0.5],
   o: [
-  	state => enqueue(state, DrifterAssignment),
+  	state => enqueue(state, TODO("Drifter")), //DrifterAssignment),
     state => enqueue(state, TODO("Draft")),
   ],
   r: () => {},  
@@ -54,8 +54,8 @@ const ContinueCareer = {
       enqueue(state, Term);
     }, 
   	state => {
-    	enqueue(state, AgentSkillSet);
-      enqueue(state, AgentSurvival);
+    	enqueue(state, Agent.SkillSet);
+      enqueue(state, Agent.Survival);
     },
   ],
   r: () => {},

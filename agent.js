@@ -1,5 +1,8 @@
-const agentAssignments = ["Law Enforcement", "Intelligence", "Corporate"];
-const agentSkills = {
+const Agent = {
+	name: "Agent",
+};
+Agent.assignments = ["Law Enforcement", "Intelligence", "Corporate"];
+Agent.skills = {
   "Personal Development": ["Gun Combat", "DEX +1", "END +1", "Melee", "INT +1", "Athletics"],
   "Service Skills": ["Streetwise", "Drive", "Investigate", "Flyer", "Recon", "Gun Combat"],
   "Advanced Education": ["Advocate", "Language", "Explosives", "Medic", "Vacc Suit", "Electronics"],
@@ -7,9 +10,9 @@ const agentSkills = {
   "Intelligence": ["Investigate", "Recon", "Electronics (comms)", "Stealth", "Persuade", "Deception"],
   "Corporate": ["Investigate", "Electronics (computers)", "Stealth", "Carouse", "Deception", "Streetwise"],
 };
-const agentCash = [1000, 2000, 5000, 7000, 10000, 25000, 50000];
-const agentBenefits = ["%Scientific Equipment", "INT +1", "%Ship Share", "%Weapon", "%Combat Implant", "SOC +1", "%TAS Membership"];
-const agentRanks = {
+Agent.cash = [1000, 2000, 5000, 7000, 10000, 25000, 50000];
+Agent.benefits = ["%Scientific Equipment", "INT +1", "%Ship Share", "%Weapon", "%Combat Implant", "SOC +1", "%TAS Membership"];
+Agent.ranks = {
 	"Law Enforcement": {
     0: tb("Rookie"),
     1: tb("Corporal", "Streetwise 1"),
@@ -38,8 +41,7 @@ const agentRanks = {
     6: tb("Director"),
   },
 };
-
-const AgentEvents = {
+Agent.Events = {
   label: "Agent Events",
   type: "set",
   v: ["Disaster! Roll on the Mishap Table, but you are not ejected from this career.",
@@ -60,8 +62,12 @@ const AgentEvents = {
   }, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
   r: () => {},
 }
-const AgentAdvancement = advancement(agentAssignments, ["INT", "INT", "INT"], [6, 5, 7]);
-const AgentEntry = {
+Agent.advancement = {
+	stats: ["INT", "INT", "INT"],
+	values: [6, 5, 7],
+}
+Agent.Advancement = advancement(Agent);
+Agent.Entry = {
   label: "Agent Qualification",
   type: "set",
   v: ["Failed", "Succeeded"],
@@ -73,21 +79,24 @@ const AgentEntry = {
     state => enqueue(state, DrifterOrDraft),
     state => {
       if (state.get("Careers").length == 0) {
-        agentSkills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
+        Agent.skills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
       } else {
-        enqueue(state, AgentBasicTraining);
+        enqueue(state, Agent.BasicTraining);
       }
-      enqueue(state, AgentAssignment);
+      enqueue(state, Agent.Assignment);
     },
   ],
   r: () => {},
 };
-const AgentSurvival = survival("Agent", agentAssignments, ["END", "INT", "INT"], [6, 7, 5], AgentEntry, AgentAdvancement)
-const AgentAssignment = assignment("Agent", agentAssignments, agentRanks, AgentSurvival);
-const AgentBasicTraining = chooseSkill("Agent Basic Training", agentSkills['Service Skills']);
+Agent.survival = {
+	stats: ["END", "INT", "INT"],
+	values: [6, 7, 5],
+}
+Agent.Survival = survival(Agent)
+Agent.Assignment = assignment(Agent);
+Agent.BasicTraining = chooseSkill("Agent Basic Training", Agent.skills['Service Skills']);
 
-
-const AgentSkillSet = {
+Agent.SkillSet = {
   label: "Skill Set",
   type: "set",
   v: skillSets,
@@ -95,8 +104,8 @@ const AgentSkillSet = {
     state => state.get("EDU") >= 8 ? 1 : 0 :
     state => 1),
   o: skillSets.map(set => set == "Assignment" ?
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[currentAssignment(state)]), true) :
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, agentSkills[set]), true)),
+    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, Agent.skills[currentAssignment(state)]), true) :
+    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, Agent.skills[set]), true)),
 
   r: () => {},
 }
