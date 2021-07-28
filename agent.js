@@ -41,6 +41,16 @@ Agent.ranks = {
     6: tb("Director"),
   },
 };
+Agent.advance = {
+	"Law Enforcement": check("INT", 6),
+	"Intelligence": check("INT", 5),
+	"Corporate": check("INT", 7),
+}
+Agent.survive = {
+	"Law Enforcement": check("END", 6),
+	"Intelligence": check("INT", 7),
+	"Corporate": check("INT", 5),
+}
 Agent.Events = {
   label: "Agent Events",
   type: "set",
@@ -61,10 +71,6 @@ Agent.Events = {
     length: 11
   }, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
   r: () => {},
-}
-Agent.advancement = {
-	stats: ["INT", "INT", "INT"],
-	values: [6, 5, 7],
 }
 Agent.Advancement = advancement(Agent);
 Agent.Entry = {
@@ -88,25 +94,8 @@ Agent.Entry = {
   ],
   r: () => {},
 };
-Agent.survival = {
-	stats: ["END", "INT", "INT"],
-	values: [6, 7, 5],
-}
 Agent.Survival = survival(Agent)
 Agent.Assignment = assignment(Agent);
 Agent.BasicTraining = chooseSkill("Agent Basic Training", Agent.skills['Service Skills']);
 
-Agent.SkillSet = {
-  label: "Skill Set",
-  type: "set",
-  v: skillSets,
-  p: skillSets.map(set => set == "Advanced Education" ?
-    state => state.get("EDU") >= 8 ? 1 : 0 :
-    state => 1),
-  o: skillSets.map(set => set == "Assignment" ?
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, Agent.skills[currentAssignment(state)]), true) :
-    state => enqueue(state, chooseSkill(`Agent ${set} Skills`, Agent.skills[set]), true)),
-
-  r: () => {},
-}
-
+Agent.SkillSet = 

@@ -93,12 +93,12 @@ function assignment(Career) {
 
 function survival(Career) {
 	function getCheck(state) {
-  	const idx = Career.assignments.indexOf(currentAssignment(state));
-    return check2d6(Career.survival.values[idx] 
-			- mod(state.get(Career.survival.stats[idx])));
+		const asgn = currentAssignment(state);
+		const check = Career.survive;
+    return check2d6(check[asgn].value - mod(state.get(check[asgn].stat)));
   }
   return {
-    label: Career.name + "Survival",
+    label: Career.name + " Survival",
     type: "set",
     v: ["Failure", "Success"],
     p: [
@@ -122,9 +122,9 @@ function survival(Career) {
 
 function advancement(Career, assignments, stats, values) {
   function getCheck(state) {
-  	const idx = Career.assignments.indexOf(currentAssignment(state));
-    return check2d6(Career.advancement.values[idx] 
-			- mod(state.get(Career.advancement.stats[idx])));
+		const asgn = currentAssignment(state);
+		const check = Career.advance;
+    return check2d6(check[asgn].value - mod(state.get(check[asgn].stat)));
   }
   function advancementSuccess(state) {
     const asgn = currentAssignment(state);
@@ -153,8 +153,8 @@ function advancement(Career, assignments, stats, values) {
       },
       state => {
       	advancementSuccess(state);
-        enqueue(state, AgentSkillSet);
-      	enqueue(state, AgentSurvival);
+        enqueue(state, Agent.SkillSet);
+      	enqueue(state, Agent.Survival);
       }
     ],
     r: state => enqueue(state, Finish, true),
@@ -167,6 +167,13 @@ function tb(title="", bonus="") {
   }
 }
 
+function check(stat, value) {
+	return {
+		stat: stat,
+		value: value,
+	}
+}
+
 function getBenefits(state) {
 	if (state.get("Careers").length == 0) return;
 	const terms = state.get(`_${currentCareer(state)}_Terms`);
@@ -176,4 +183,20 @@ function getBenefits(state) {
   const set = rewardSet(Agent.cash, Agent.benefits);
   const benefitRoll = rank >= 5 ? set[1] : set[0]; 
   [...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
+}
+
+function skillSet(Career) {
+	return {
+		label: "Skill Set",
+		type: "set",
+		v: skillSets,
+		p: skillSets.map(set => set == "Advanced Education" ?
+			state => state.get("EDU") >= 8 ? 1 : 0 :
+			state => 1),
+		o: skillSets.map(set => set == "Assignment" ?
+			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[currentAssignment(state)]), true) :
+			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[set]), true)),
+
+		r: () => {},
+	}
 }
