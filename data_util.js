@@ -1,10 +1,8 @@
-const v_2d6 = Array.from({
-  length: 11
-}, (x, i) => i + 2)
+const v_2d6 = Array.from({length: 11}, (x, i) => i + 2);
+
 const p_2d6 = v_2d6
   .map(x => x <= 6 ? x - 1 : 13 - x)
-  .map(x => state => x)
-
+  .map(x => state => x);
 
 function uniform(spec) {
   spec.p = spec.v.map(x => state => 1);
@@ -58,7 +56,7 @@ function getMod(state, attr) {
 
 function parseSkill(str) {
 	if (str.startsWith("%")) {
-  	return state => append(state, "Assets", str.substring(1));
+  	return state => append(state, ASSETS, str.substring(1));
   }
   for (const char of characteristics) {
     if (str.startsWith(char)) {
@@ -75,8 +73,15 @@ function parseSkill(str) {
 }
 
 function currentCareer(state) {
-	return state.get("Careers").slice(-1)[0];
+	return state.get(CAREERS).slice(-1)[0];
 }
+
 function currentAssignment(state) {
 	return currentCareer(state).split("/")[1];
+}
+
+function isFirstCareer(state) {
+	return state.get(CAREERS)
+		.filter(career => !PreCareers.some(pre => career.includes(pre)))
+		.length == 0;
 }

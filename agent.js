@@ -84,7 +84,8 @@ Agent.Entry = {
   o: [
     state => enqueue(state, DrifterOrDraft),
     state => {
-      if (state.get("Careers").length == 0) {
+			console.log(state.get(CAREERS), isFirstCareer(state));
+      if (isFirstCareer(state)) {
         Agent.skills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
       } else {
         enqueue(state, Agent.BasicTraining);
@@ -98,4 +99,4 @@ Agent.Survival = survival(Agent)
 Agent.Assignment = assignment(Agent);
 Agent.BasicTraining = chooseSkill("Agent Basic Training", Agent.skills['Service Skills']);
 
-Agent.SkillSet = 
+Agent.SkillSet = skillSet(Agent);

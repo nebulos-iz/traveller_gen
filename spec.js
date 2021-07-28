@@ -11,13 +11,13 @@
 const Term = {
   label: "New Term",
   type: "set",
-  v: ["University", "Army", "Marines", "Navy", "Agent", "TODO"],
+  v: [UNIVERSITY, ARMY_ACADEMY, MARINE_ACADEMY, NAVY_ACADEMY, AGENT, "TODO"],
   p: [
-  	state => canPreCareer(state, check2d6(7 - mod(state.get("EDU")) + state.get("terms") - (state.get("SOC") >= 9 ? 1 : 0))),
-    state => canPreCareer(state, check2d6(8 - mod(state.get("END")) + 2 * state.get("terms"))),
-    state => canPreCareer(state, check2d6(9 - mod(state.get("END")) + 2 * state.get("terms"))),
-    state => canPreCareer(state, check2d6(9 - mod(state.get("INT")) + 2 * state.get("terms"))),
-    state => check2d6(6 - mod(state.get("INT")) + state.get("Careers").length),
+  	state => canPreCareer(state, check2d6(7 - mod(state.get(EDU)) + state.get(TERMS) - (state.get(SOC) >= 9 ? 1 : 0))),
+    state => canPreCareer(state, check2d6(8 - mod(state.get(END)) + 2 * state.get(TERMS))),
+    state => canPreCareer(state, check2d6(9 - mod(state.get(END)) + 2 * state.get(TERMS))),
+    state => canPreCareer(state, check2d6(9 - mod(state.get(INT)) + 2 * state.get(TERMS))),
+    state => check2d6(6 - mod(state.get(INT)) + state.get(CAREERS).length),
     state => 0.01,
   ],
   o: [
@@ -34,7 +34,7 @@ const Term = {
 const DrifterOrDraft = {
 	label: "Drifter or Draft",
   type: "set",
-  v: ["Drifter", "Draft"],
+  v: [DRIFTER, DRAFT],
   p: [state => 0.5, state => 0.5],
   o: [
   	state => enqueue(state, TODO("Drifter")), //DrifterAssignment),
@@ -67,9 +67,9 @@ const Finish = {
   v: ["Yes", "No"],
   p: [state => 0.5, state => 0.5],
   o: [
-  	state => {state.set("queue", []); getBenefits(state)},
+  	state => {state.set(QUEUE, []); getBenefits(state)},
     () => {}
   ],
-  r: state => incr(state, "terms"),
+  r: state => incr(state, TERMS),
 }
 

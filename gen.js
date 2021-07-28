@@ -6,7 +6,7 @@ const char = dom(out, 'char');
 const log = dom(out, 'log');
 
 let state = new Map();
-state.set("terms", 0);
-state.set("Careers", []);
+state.set(TERMS, 0);
+state.set(CAREERS, []);
 enqueue(state, Name);
 run(state);
