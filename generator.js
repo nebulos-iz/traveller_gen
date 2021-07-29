@@ -40,7 +40,7 @@ function generator(generatorFunctions) {
 
 const freeform = generator({
   outcome: (state, spec, value) => spec.o(state, value),
-  random: spec => spec.v,
+  random: spec => spec.v[Math.floor(Math.random() * spec.v.length)],
   render: (spec, initialValue) => {
     const input = document.createElement("input");
     input.setAttribute("type", "text");

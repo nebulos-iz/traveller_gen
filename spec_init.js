@@ -1,7 +1,7 @@
 const Name = {
   label: "Name",
   type: "freeform",
-  v: "Placeholder Name",
+  v: names,
   o: (state, val) => state.set("name", val),
   r: state => {
     Characteristics.forEach(c => enqueue(state, c));
