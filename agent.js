@@ -41,6 +41,7 @@ Agent.ranks = {
     6: tb("Director"),
   },
 };
+Agent.enter = check(INT, 6);
 Agent.advance = {
 	"Law Enforcement": check("INT", 6),
 	"Intelligence": check("INT", 5),
@@ -73,28 +74,7 @@ Agent.Events = {
   r: () => {},
 }
 Agent.Advancement = advancement(Agent);
-Agent.Entry = {
-  label: "Agent Qualification",
-  type: "set",
-  v: ["Failed", "Succeeded"],
-  p: [
-    state => 1 - check2d6(6 - mod(state.get("INT"))),
-    state => check2d6(6 - mod(state.get("INT"))),
-  ],
-  o: [
-    state => enqueue(state, DrifterOrDraft),
-    state => {
-			console.log(state.get(CAREERS), isFirstCareer(state));
-      if (isFirstCareer(state)) {
-        Agent.skills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
-      } else {
-        enqueue(state, Agent.BasicTraining);
-      }
-      enqueue(state, Agent.Assignment);
-    },
-  ],
-  r: () => {},
-};
+Agent.Entry = entry(Agent);
 Agent.Survival = survival(Agent)
 Agent.Assignment = assignment(Agent);
 Agent.BasicTraining = chooseSkill("Agent Basic Training", Agent.skills['Service Skills']);

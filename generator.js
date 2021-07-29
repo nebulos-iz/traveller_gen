@@ -24,7 +24,6 @@ function generator(generatorFunctions) {
       	console.log(spec.label, spec.p.map(p => p(state)));
       }
     }
-    run(state, spec, randomValue);
     const container = dom(log, "c", );
     const label = dom(container, "", spec.label);
     const input = doRender(spec, randomValue);
@@ -34,6 +33,7 @@ function generator(generatorFunctions) {
       run(state, spec, doSelect(e));
       eraseAndRerun(container, state);
     });
+    run(state, spec, randomValue);
     return container;
   }
 }
@@ -74,7 +74,8 @@ const set = generator({
     const total = spec.p.map(p => p(state)).reduce((a, b) => a + b);
     for (let i = 0; i < spec.v.length; i++) {
       const option = document.createElement("option");
-      option.text = `${spec.v[i]} (${(spec.p[i](state) / total * 100).toFixed(2)}%)`;
+      option.text = `${spec.v[i]} (${(spec.p[i](state)).toFixed(2)}%)`;
+      // option.text = `${spec.v[i]} (${(spec.p[i](state) / total * 100).toFixed(2)}%)`;
       input.add(option);
     }
     input.selectedIndex = initialValue;
@@ -111,7 +112,8 @@ const pick = generator({
     input.multiple = true;
     for (let i = 0; i < spec.v.length; i++) {
       const option = document.createElement("option");
-      option.text = `${spec.v[i]} (${(spec.p[i](state) / total * 100).toFixed(2)}%)`;
+      option.text = `${spec.v[i]} (${(spec.p[i](state)).toFixed(2)}%)`;
+      //option.text = `${spec.v[i]} (${(spec.p[i](state) / total * 100).toFixed(2)}%)`;
       input.add(option);
       if (initialValue.includes(i)) {
         option.selected = true;

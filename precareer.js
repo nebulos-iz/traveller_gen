@@ -1,7 +1,11 @@
-function canPreCareer(state, check) {
+function canPreCareer(state, precareer, check) {
 	const terms = state.get("terms");
   if (terms > 2) return 0;
   if (state.has("_PreCareerAttempt_" + terms)) return 0;
+	if (state.get(CAREERS).includes(_GRAD(precareer, HONORS))
+		|| state.get(CAREERS).includes(_GRAD(precareer, GRAD))) {
+		return 0;
+	}
   return check;
 }
 
@@ -115,14 +119,19 @@ const UniversityGraduation = {
     state => universityGradCheck(11),
   ],
   o: [
-    state => enqueue(state, UniversitySkills),
+    state => {
+			enqueue(state, UniversitySkills),
+			append(state, CAREERS, _GRAD(UNIVERSITY, FLUNKED));
+		},
     state => {
       enqueue(state, UniversitySkillsGrad);
-      entryBenefits.forEach(b => state.set("_DM_" + b, 1))
+      entryBenefits.forEach(b => state.set(_DM_ENTRY(b), 1));
+			append(state, CAREERS, _GRAD(UNIVERSITY, GRAD));
     },
     state => {
       enqueue(state, UniversitySkillsGrad);
-      entryBenefits.forEach(b => state.set("_DM_" + b, 2))
+      entryBenefits.forEach(b => state.set(_DM_ENTRY(b), 2));
+			append(state, CAREERS, _GRAD(UNIVERSITY, HONORS));
     },
   ],
   r: state => {
@@ -151,7 +160,7 @@ const UniversitySkillsGrad = uniform({
 
 function academyEntry(branch, char, value, skills, gradSpec) {
   return {
-    label: branch + " Academy Entry",
+    label: branch + " Entry",
     type: "set",
     v: ["Failed", "Succeeded"],
     p: [
@@ -184,7 +193,7 @@ function academyGraduation(branch) {
       getMod(state, "Graduate"));
   }
   return {
-    label: branch + " Academy Graduation",
+    label: branch + " Graduation",
     type: "set",
     v: ["Kicked Out", "Failed", "Succeeded", "Honors"],
     p: [
@@ -196,20 +205,24 @@ function academyGraduation(branch) {
     o: [
       state => {
         state.set(`_DM_${branch}_Commission`, -12);
+				append(state, CAREERS, _GRAD(branch, FLUNKED));
       },
       state => {
         state.set("_DM_" + branch, 12);
         state.set(`_DM_${branch}_Commission`, -12)
+				append(state, CAREERS, _GRAD(branch, FLUNKED));
       },
       state => {
         incr(state, "EDU");
         academyBenefits(state)
+				append(state, CAREERS, _GRAD(branch, GRAD));
       },
       state => {
         incr(state, "EDU");
         incr(state, "SOC");
         academyBenefits(state);
         state.set(`_DM_${branch}_Commission`, 12)
+				append(state, CAREERS, _GRAD(branch, HONORS));
       },
     ],
     r: state => {
@@ -220,13 +233,13 @@ function academyGraduation(branch) {
 }
 
 const armyServiceSkills = ["Drive", "Vacc Suit", "Athletics", "Gun Combat", "Recon", "Melee", "Heavy Weapons"];
-const ArmyAcademyGraduation = academyGraduation("Army");
-const ArmyAcademyEntry = academyEntry("Army", "END", 8, armyServiceSkills, ArmyAcademyGraduation);
+const ArmyAcademyGraduation = academyGraduation(ARMY_ACADEMY);
+const ArmyAcademyEntry = academyEntry(ARMY_ACADEMY, END, 8, armyServiceSkills, ArmyAcademyGraduation);
 
 const marineServiceSkills = ["Vacc Suit", "Athletics", "Gun Combat", "Heavy Weapons", "Tactics", "Stealth"];
-const MarineAcademyGraduation = academyGraduation("Marine");
-const MarineAcademyEntry = academyEntry("Marine", "END", 9, marineServiceSkills, MarineAcademyGraduation);
+const MarineAcademyGraduation = academyGraduation(MARINE_ACADEMY);
+const MarineAcademyEntry = academyEntry(MARINE_ACADEMY, END, 9, marineServiceSkills, MarineAcademyGraduation);
 
 const navyServiceSkills = ["Vacc Suit", "Athletics", "Gun Combat", "Pilot", "Gunner", "Mechanic"];
-const NavyAcademyGraduation = academyGraduation("Navy");
-const NavyAcademyEntry = academyEntry("Marine", "INT", 9, navyServiceSkills, NavyAcademyGraduation);
+const NavyAcademyGraduation = academyGraduation(NAVY_ACADEMY);
+const NavyAcademyEntry = academyEntry(NAVY_ACADEMY, INT, 9, navyServiceSkills, NavyAcademyGraduation);

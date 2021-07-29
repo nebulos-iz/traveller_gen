@@ -1,3 +1,17 @@
+function tb(title="", bonus="") {
+	return {
+		title: title,
+		bonus: bonus,
+	}
+}
+
+function check(stat, value) {
+	return {
+		stat: stat,
+		value: value,
+	}
+}
+
 function TODO(label = "TODO") {
 	return {
 		label: label,
@@ -72,23 +86,29 @@ function rewardSet(cashList, benefitList) {
 }
 
 function assignment(Career) {
-	return uniform({
+	return {
 		label: Career.name + " Assignment",
 		type: "set",
 		v: Career.assignments,
-		o: Career.assignments.map(x => state => {
-			append(state, "Careers", Career.name + "/" + x);
+		p: Career.assignments.map(asgn => state => {
+			if (state.get(CAREERS).includes(_CASGN(Career.name, asgn))) {
+				return 0;
+			}
+			return 1;
+		}),
+		o: Career.assignments.map(asgn => state => {
+			append(state, CAREERS, _CASGN(Career.name, asgn));
 			const career = currentCareer(state);
 			state.set(_TERMS(career), 0);
 			state.set(_RANK(career), 0);
-			const title = Career.ranks[x][0].title;
+			const title = Career.ranks[asgn][0].title;
 			if (title != "") {
 				state.set(`${currentCareer(state)} Title`, title);
 			}
 			enqueue(state, Career.Survival);
 		}),
 		r: state => {},
-	});
+	}
 }
 
 function survival(Career) {
@@ -160,27 +180,14 @@ function advancement(Career, assignments, stats, values) {
 		r: state => enqueue(state, Finish, true),
 	}
 }
-function tb(title="", bonus="") {
-	return {
-		title: title,
-		bonus: bonus,
-	}
-}
-
-function check(stat, value) {
-	return {
-		stat: stat,
-		value: value,
-	}
-}
 
 function getBenefits(state) {
-	if (state.get(CAREERS).length == 0) return;
+	if (isCurrentPreCareer(state)) return;
 	const career = currentCareer(state)
 	const terms = state.get(_TERMS(career));
 	const rank = state.get(_RANK(career));
 	const rankBonus = Math.ceil(rank / 2);
-	const numBenefits = terms + rankBonus;
+	const numBenefits = Math.max(0, terms + rankBonus);
 	const set = rewardSet(Agent.cash, Agent.benefits);
 	const benefitRoll = rank >= 5 ? set[1] : set[0]; 
 	[...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
@@ -199,4 +206,35 @@ function skillSet(Career) {
 			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[set]), true)),
 		r: () => {},
 	}
+}
+
+function entry(Career) {
+	return {
+		label: Career.name + " Qualification",
+		type: "set",
+		v: ["Failed", "Succeeded"],
+		p: [
+			state => 1 - check2d6(Career.enter.value - mod(state.get(Career.enter.stat))),
+			state => check2d6(Career.enter.value - mod(state.get(Career.enter.stat))),
+		],
+		o: [
+			state => enqueue(state, DrifterOrDraft),
+			state => {
+				if (isFirstCareer(state)) {
+					Career.skills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
+				} else {
+					enqueue(state, Career.BasicTraining);
+				}
+				enqueue(state, Career.Assignment);
+			},
+		],
+		r: () => {},
+	}
+}
+
+function canCareer(state, career, check) {
+	if (state.get(CAREERS).filter(h => h.startsWith(career)).length > 2) {
+		return 0;
+	}
+	return check;
 }

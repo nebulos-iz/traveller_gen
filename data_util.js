@@ -85,3 +85,7 @@ function isFirstCareer(state) {
 		.filter(career => !PreCareers.some(pre => career.includes(pre)))
 		.length == 0;
 }
+
+function isCurrentPreCareer(state) {
+	return PreCareers.some(pre => currentCareer(state).startsWith(pre));
+}
