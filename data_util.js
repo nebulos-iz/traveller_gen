@@ -56,22 +56,38 @@ function get(state, attr, val = 0) {
 	return state.get(attr);
 }
 
+function parseStat(str) {
+	for (const char of characteristics) {
+		if (str.startsWith(char)) {
+			const val = parseInt(str.split("+")[1]);
+			return state => incr(state, char, val);
+		}
+	}
+	return null
+}
+
 function parseSkill(str) {
-	if (str.startsWith("%")) {
-  	return state => append(state, ASSETS, str.substring(1));
-  }
-  for (const char of characteristics) {
-    if (str.startsWith(char)) {
-      const val = parseInt(str.split("+")[1]);
-      return state => incr(state, char, val);
-    }
-  }
+	const stat = parseStat(str);
+	if (stat != null) {
+		return stat;
+	}
   const re = /(.*) ([0-9])/;
   const match = str.match(re);
   if (match != null) {
   	return state => setSkill(state, match[1], parseInt(match[2]));
   }
   return state => incr(state, str);
+}
+
+function parseBenefit(str) {
+	if (Array.isArray(str)) {
+		return state => str.forEach(s => parseBenefit(s)(state));
+	}
+	const stat = parseStat(str);
+	if (parseStat(str) != null) {
+		return stat;
+	}
+	return state => append(state, ASSETS, str.substring(1));
 }
 
 function currentCareer(state) {
@@ -85,7 +101,7 @@ function currentAssignment(state) {
 function isFirstCareer(state) {
 	return state.get(CAREERS)
 		.filter(career => !PreCareers.some(pre => career.includes(pre)))
-		.length == 0;
+		.length == 1;
 }
 
 function isCurrentPreCareer(state) {

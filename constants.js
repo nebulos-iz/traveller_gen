@@ -58,3 +58,10 @@ function _PRE_CAREER_ATTEMPT(term) {
 function _EXTRA_SKILLS(career) {
   return `_${career}_ExtraSkills`;
 }
+
+const WEAPON = "Weapon";
+const CONTACT = "Contact";
+const ALLY = "Ally";
+const SHIP_SHARE = "Ship Share";
+const SCIENTIFIC_EQUIPMENT = "Scientific Equipment";
+const COMBAT_IMPLANT = "Combat Implant";

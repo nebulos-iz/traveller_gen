@@ -11,13 +11,14 @@
 const Term = {
   label: "New Term",
   type: "set",
-  v: [UNIVERSITY, ARMY_ACADEMY, MARINE_ACADEMY, NAVY_ACADEMY, AGENT, "TODO"],
+  v: [UNIVERSITY, ARMY_ACADEMY, MARINE_ACADEMY, NAVY_ACADEMY, AGENT, DRIFTER, "TODO"],
   p: [
   	state => canPreCareer(state, UNIVERSITY, check2d6(7 - mod(state.get(EDU)) + state.get(TERMS) - (state.get(SOC) >= 9 ? 1 : 0))),
     state => canPreCareer(state, ARMY_ACADEMY, check2d6(8 - mod(state.get(END)) + 2 * state.get(TERMS))),
     state => canPreCareer(state, MARINE_ACADEMY, check2d6(9 - mod(state.get(END)) + 2 * state.get(TERMS))),
     state => canPreCareer(state, NAVY_ACADEMY, check2d6(9 - mod(state.get(INT)) + 2 * state.get(TERMS))),
     state => canCareer(state, AGENT, check2d6(6 - mod(state.get(INT)) + state.get(CAREERS).length)),
+    state => 0.1,
     state => 0.01,
   ],
   o: [
@@ -26,6 +27,7 @@ const Term = {
     state => enqueue(state, MarineAcademyEntry),
     state => enqueue(state, NavyAcademyEntry),
     state => enqueue(state, Agent.Entry),
+    state => enqueue(state, Drifter.Entry),
     state => {},
   ],
   r: () => {},
@@ -37,7 +39,7 @@ const DrifterOrDraft = {
   v: [DRIFTER, DRAFT],
   p: [state => 0.5, state => 0.5],
   o: [
-  	state => enqueue(state, TODO("Drifter")), //DrifterAssignment),
+  	state => enqueue(state, DrifterAssignment),
     state => enqueue(state, TODO("Draft")),
   ],
   r: () => {},  

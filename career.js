@@ -69,7 +69,7 @@ function benefits(values) {
 		label: "Benefits",
 		type: "set", 
 		v: values,
-		o: values.map(parseSkill),
+		o: values.map(parseBenefit),
 		r: () => {},
 	});
 }
@@ -105,11 +105,18 @@ function assignment(Career) {
 			if (title != "") {
 				state.set(`${currentCareer(state)} Title`, title);
 			}
+			// Basic training
+			if (isFirstCareer(state)) {
+				Career.basicTrainingSkills(state).forEach(skill => setSkill(state, skill, 0));
+			} else {
+				enqueue(state, chooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
+			}
 			enqueue(state, Career.Survival);
 		}),
 		r: state => {},
 	}
 }
+
 
 function survival(Career) {
 	function getCheck(state) {
@@ -174,11 +181,11 @@ function advancement(Career, assignments, stats, values) {
 			},
 			state => {
 				advancementSuccess(state);
-				enqueue(state, Agent.SkillSet);
-				enqueue(state, Agent.Survival);
+				enqueue(state, Career.SkillSet);
+				enqueue(state, Career.Survival);
 			}
 		],
-		r: state => enqueue(state, Finish, true),
+		r: state => enqueue(state, Finish),
 	}
 }
 
@@ -218,11 +225,6 @@ function entry(Career) {
 		o: [
 			state => enqueue(state, DrifterOrDraft),
 			state => {
-				if (isFirstCareer(state)) {
-					Career.skills["Service Skills"].forEach(skill => setSkill(state, skill, 0));
-				} else {
-					enqueue(state, Career.BasicTraining);
-				}
 				enqueue(state, Career.Assignment);
 			},
 		],
