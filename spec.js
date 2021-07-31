@@ -65,7 +65,7 @@ const Finish = {
 	label: "Finish?",
   type: "set",
   v: ["Yes", "No"],
-  p: [state => 1.0, state => 0.0],
+  p: [state => 0.2, state => 0.8],
   o: [
   	state => {state.set(QUEUE, []); getBenefits(state)},
     () => {}

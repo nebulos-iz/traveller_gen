@@ -1,7 +1,7 @@
 function canPreCareer(state, precareer, check) {
 	const terms = state.get("terms");
   if (terms > 2) return 0;
-  if (state.has("_PreCareerAttempt_" + terms)) return 0;
+  if (state.has(_PRE_CAREER_ATTEMPT(terms))) return 0;
 	if (state.get(CAREERS).includes(_GRAD(precareer, HONORS))
 		|| state.get(CAREERS).includes(_GRAD(precareer, GRAD))) {
 		return 0;
@@ -30,7 +30,7 @@ const PreCareerEvents = {
   p: p_2d6,
   o: [
     state => {},
-    state => state.set("_DM_Graduate", -12),
+    state => state.set(_DM_GRADUATE, -12),
     state => enqueue(state, PreCareerPrank, true),
     state => setSkill(state, "Carouse", 1),
     state => enqueue(state, PreCareerFriends, true),
@@ -39,7 +39,7 @@ const PreCareerEvents = {
     state => enqueue(state, TODO("Hobby"), true),
     state => enqueue(state, TODO("Tutor"), true),
     state => enqueue(state, TODO("Draft"), true),
-    state => incr(state, "SOC"),
+    state => incr(state, SOC),
   ],
   r: () => [],
 }
@@ -50,8 +50,8 @@ const PreCareerPrank = {
   v: ["Imprisoned", "Enemy", "Rival"],
   p: [
     state => 1 / 36,
-    state => 1 - check2d6(8 - mod(state.get("SOC"))) - 1 / 36,
-    state => check2d6(8 - mod(state.get("SOC"))),
+    state => 1 - check2d6(8 - mod(state.get(SOC))) - 1 / 36,
+    state => check2d6(8 - mod(state.get(SOC))),
   ],
   o: [
     state => enqueue(state, TODO("Imprisoned")),
@@ -74,8 +74,8 @@ const PreCareerMovement = {
   type: "set",
   v: ["Failure", "Success"],
   p: [
-    state => 1 - check2d6(8 - mod(state.get("SOC"))),
-    state => check2d6(8 - mod(state.get("SOC"))),
+    state => 1 - check2d6(8 - mod(state.get(SOC))),
+    state => check2d6(8 - mod(state.get(SOC))),
   ],
   o: [
     state => {},
@@ -92,23 +92,25 @@ const UniversityEntry = {
   type: "set",
   v: ["Failed", "Succeeded"],
   p: [
-    state => 1 - check2d6(7 - mod(state.get("EDU"))),
-    state => check2d6(7 - mod(state.get("EDU"))),
+    state => 1 - check2d6(7 - mod(state.get(EDU))),
+    state => check2d6(7 - mod(state.get(EDU))),
   ],
   o: [
     state => enqueue(state, Term),
     state => {
-      incr(state, "EDU");
+      incr(state, EDU);
       enqueue(state, PreCareerEvents);
       enqueue(state, UniversityGraduation);
     },
   ],
-  r: state => state.set("_PreCareerAttempt_" + state.get("terms"), 1),
+  r: state => {
+		state.set(_PRE_CAREER_ATTEMPT(state.get("terms")), 1)
+	},
 }
 
 // TODO: DM+1(2) to qualify for Agent, Army, Citizen (corporate), Entertainer(journalist), Marines, Navy, Scholar, Scouts; commission roll
 const entryBenefits = ["Agent", "Army", "Citizen (corporate)", "Entertainer (journalist)", "Marines", "Navy", "Scholar", "Scouts", "Commission"];
-const universityGradCheck = val => check2d6(val - mod(state.get("INT")) - getMod(state, "Graduate"));
+const universityGradCheck = val => check2d6(val - mod(state.get(INT)) - get(state, _DM_GRADUATE));
 const UniversityGraduation = {
   label: "University Graduation",
   type: "set",
@@ -137,6 +139,7 @@ const UniversityGraduation = {
   r: state => {
   	enqueue(state, Finish);
     enqueue(state, Term);
+		state.delete(_DM_GRADUATE);
   },
 }
 
@@ -181,16 +184,16 @@ function academyEntry(branch, char, value, skills, gradSpec) {
 
 function academyGraduation(branch) {
   const academyBenefits = state => {
-    state.set(`_${branch}_ExtraSkills`, 1);
-    state.set("_DM_" + branch, 12);
-    state.set("_DM_Commission", 2);
+    state.set(_EXTRA_SKILLS(branch), 1);
+    state.set(_DM_ENTRY(branch), 12);
+    state.set(_DM_COMMISSION(branch), 2);
   }
 
   function academyGraduationCheck(value, state) {
-    return check2d6(value - mod(state.get("INT")) -
-      (state.get("END") >= 8 ? 1 : 0) -
-      (state.get("SOC") >= 8 ? 1 : 0) -
-      getMod(state, "Graduate"));
+    return check2d6(value - mod(state.get(INT)) -
+      (state.get(END) >= 8 ? 1 : 0) -
+      (state.get(SOC) >= 8 ? 1 : 0) -
+      get(state, _DM_GRADUATE));
   }
   return {
     label: branch + " Graduation",
@@ -204,30 +207,31 @@ function academyGraduation(branch) {
     ],
     o: [
       state => {
-        state.set(`_DM_${branch}_Commission`, -12);
+        state.set(_DM_COMMISSION(branch), -12);
 				append(state, CAREERS, _GRAD(branch, FLUNKED));
       },
       state => {
-        state.set("_DM_" + branch, 12);
-        state.set(`_DM_${branch}_Commission`, -12)
+        state.set(_DM_ENTRY(branch), 12);
+        state.set(_DM_COMMISSION(branch), -12)
 				append(state, CAREERS, _GRAD(branch, FLUNKED));
       },
       state => {
-        incr(state, "EDU");
+        incr(state, EDU);
         academyBenefits(state)
 				append(state, CAREERS, _GRAD(branch, GRAD));
       },
       state => {
-        incr(state, "EDU");
-        incr(state, "SOC");
+        incr(state, EDU);
+        incr(state, SOC);
         academyBenefits(state);
-        state.set(`_DM_${branch}_Commission`, 12)
+        state.set(_DM_COMMISSION(branch), 12)
 				append(state, CAREERS, _GRAD(branch, HONORS));
       },
     ],
     r: state => {
     	enqueue(state, Finish);
       enqueue(state, Term);
+		state.delete(_DM_GRADUATE);
     }
   }
 }

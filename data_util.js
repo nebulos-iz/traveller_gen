@@ -13,6 +13,10 @@ function mod(stat) {
   return stat == 0 ? -3 : Math.ceil((stat - 8) / 3);
 }
 
+function binary(check) {
+	return [state => 1 - check(state), state => check(state)];
+}
+
 // Returns the probability of meeting the target
 function check2d6(target) {
   if (target < 2) return 1;
@@ -47,11 +51,9 @@ function append(state, attr, value) {
   state.get(attr).push(value);
 }
 
-function getMod(state, attr) {
-  if (!state.has("_DM_" + attr)) {
-    return 0;
-  }
-  return state.get("_DM_" + attr);
+function get(state, attr, val = 0) {
+	if (!state.has(attr)) return val;
+	return state.get(attr);
 }
 
 function parseSkill(str) {

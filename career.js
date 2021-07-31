@@ -117,6 +117,7 @@ function survival(Career) {
 		const check = Career.survive;
 		return check2d6(check[asgn].value - mod(state.get(check[asgn].stat)));
 	}
+
 	return {
 		label: Career.name + " Survival",
 		type: "set",
@@ -213,10 +214,7 @@ function entry(Career) {
 		label: Career.name + " Qualification",
 		type: "set",
 		v: ["Failed", "Succeeded"],
-		p: [
-			state => 1 - check2d6(Career.enter.value - mod(state.get(Career.enter.stat))),
-			state => check2d6(Career.enter.value - mod(state.get(Career.enter.stat))),
-		],
+		p: binary(state => check2d6(Career.enter.value - mod(state.get(Career.enter.stat)) - get(state, _DM_ENTRY(Career.name)))),
 		o: [
 			state => enqueue(state, DrifterOrDraft),
 			state => {

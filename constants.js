@@ -39,10 +39,22 @@ function _CASGN(career, assignment) {
 function _DM_ENTRY(career) {
 	return `_DM_Entry_${career}`;
 }
+const _DM_GRADUATE = "_DM_Graduate";
+function _DM_COMMISSION(branch) {
+	return `_DM_Commission_${branch}`;
+}
 
 const FLUNKED = "flunked";
 const GRAD = "grad";
 const HONORS = "honors";
 function _GRAD(precareer, outcome) {
 	return `${precareer} (${outcome})`
+}
+
+function _PRE_CAREER_ATTEMPT(term) {
+  return "_PreCareerAttempt_" + term;
+}
+
+function _EXTRA_SKILLS(career) {
+  return `_${career}_ExtraSkills`;
 }
