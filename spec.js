@@ -37,10 +37,10 @@ const DrifterOrDraft = {
 	label: "Drifter or Draft",
   type: "set",
   v: [DRIFTER, DRAFT],
-  p: [state => 0.5, state => 0.5],
+  p: [state => 1, state => state.has(_DRAFTED) ? 0 : 1],
   o: [
   	state => enqueue(state, assignment(Drifter)),
-    state => enqueue(state, TODO("Draft")),
+    state => enqueue(state, Draft),
   ],
   r: () => {},  
 };
@@ -57,7 +57,9 @@ const Draft = uniform({
 		state => enqueue(state, TODO("Scout")),
 		state => enqueue(state, TODO("Agent/Law Enforcement")),
 	],
-	r: () => {},
+	r: state => {
+		state.set(_DRAFTED, 1);
+	},
 });
 
 

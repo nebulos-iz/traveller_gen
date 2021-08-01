@@ -43,8 +43,8 @@ function rewards(benefits, cash) {
 		type: "set",
 		v: ["Benefit", "Cash"],
 		p: [
-			state => state.get(_CASH_TAKEN) > 2 ? 1 : 0.5,
-			state => state.get(_CASH_TAKEN) > 2 ? 0 : 0.5,
+			state => 1,
+			state => state.get(_CASH_TAKEN) > 2 ? 0 : 1,
 		],
 		o: [
 			state => enqueue(state, benefits, true),
