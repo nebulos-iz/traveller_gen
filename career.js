@@ -96,12 +96,12 @@ function Assignment(Career) {
 			}
 			return 1;
 		}),
-		o: Career.assignments.map(asgn => joinAssignment(Career, asgn)),
+		o: Career.assignments.map(asgn => startAssignment(Career, asgn)),
 		r: state => {},
 	}
 }
 
-function joinAssignment(Career, asgn) {
+function startAssignment(Career, asgn) {
 	return state => {
 		append(state, CAREERS, _CASGN(Career.name, asgn));
 		const career = currentCareer(state);

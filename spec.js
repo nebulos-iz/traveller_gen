@@ -55,7 +55,7 @@ const Draft = uniform({
 		state => enqueue(state, TODO("Marine")),
 		state => enqueue(state, TODO("Merchant Marine")),
 		state => enqueue(state, TODO("Scout")),
-		state => enqueue(state, TODO("Agent/Law Enforcement")),
+		startAssignment(Agent, "Law Enforcement"),
 	],
 	r: state => {
 		state.set(_DRAFTED, 1);
