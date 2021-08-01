@@ -43,7 +43,22 @@ const DrifterOrDraft = {
     state => enqueue(state, TODO("Draft")),
   ],
   r: () => {},  
-}
+};
+
+const Draft = uniform({
+	label: "Draft",
+	type: "set",
+	v: ["Navy", "Army", "Marine", "Merchant Marine", "Scout", "Agent/Law Enforcement"],
+	o: [
+		state => enqueue(state, TODO("Navy")),
+		state => enqueue(state, TODO("Army")),
+		state => enqueue(state, TODO("Marine")),
+		state => enqueue(state, TODO("Merchant Marine")),
+		state => enqueue(state, TODO("Scout")),
+		state => enqueue(state, TODO("Agent/Law Enforcement")),
+	],
+	r: () => {},
+});
 
 
 const Finish = {

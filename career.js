@@ -96,24 +96,28 @@ function assignment(Career) {
 			}
 			return 1;
 		}),
-		o: Career.assignments.map(asgn => state => {
-			append(state, CAREERS, _CASGN(Career.name, asgn));
-			const career = currentCareer(state);
-			state.set(_TERMS(career), 0);
-			state.set(_RANK(career), 0);
-			const title = Career.ranks[asgn][0].title;
-			if (title != "") {
-				state.set(`${currentCareer(state)} Title`, title);
-			}
-			// Basic training
-			if (isFirstCareer(state)) {
-				Career.basicTrainingSkills(state).forEach(skill => setSkill(state, skill, 0));
-			} else {
-				enqueue(state, chooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
-			}
-			enqueue(state, survival(Career));
-		}),
+		o: Career.assignments.map(asgn => joinAssignment(Career, asgn)),
 		r: state => {},
+	}
+}
+
+function joinAssignment(Career, asgn) {
+	return state => {
+		append(state, CAREERS, _CASGN(Career.name, asgn));
+		const career = currentCareer(state);
+		state.set(_TERMS(career), 0);
+		state.set(_RANK(career), 0);
+		const title = Career.ranks[asgn][0].title;
+		if (title != "") {
+			state.set(`${currentCareer(state)} Title`, title);
+		}
+		// Basic training
+		if (isFirstCareer(state)) {
+			Career.basicTrainingSkills(state).forEach(skill => setSkill(state, skill, 0));
+		} else {
+			enqueue(state, chooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
+		}
+		enqueue(state, survival(Career));
 	}
 }
 
@@ -264,7 +268,7 @@ function finish(Career)  {
 		label: "Finish?",
 		type: "set",
 		v: ["Yes", "No"],
-		p: [state => 0.2, state => 0.8],
+		p: [state => state.get(TERMS) + 1, state => 2],
 		o: [
 			state => {state.set(QUEUE, []); getBenefits(state, Career)},
 			() => {}
