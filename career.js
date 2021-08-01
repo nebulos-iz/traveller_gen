@@ -27,7 +27,7 @@ function TODO(label = "TODO") {
 	}
 }
 
-function chooseSkill(label, skills) {
+function ChooseSkill(label, skills) {
 	return uniform({
 		label: label,
 		type: "set",
@@ -37,7 +37,7 @@ function chooseSkill(label, skills) {
 	})
 }
 
-function rewards(benefits, cash) {
+function Rewards(benefits, cash) {
 	return  {
 		label: "Benefit Or Cash",
 		type: "set",
@@ -54,7 +54,7 @@ function rewards(benefits, cash) {
 	};
 }
 
-function cash(values) {
+function Cash(values) {
 	return uniform({
 		label: "Cash",
 		type: "set", 
@@ -64,7 +64,7 @@ function cash(values) {
 	});
 }
 
-function benefits(values) {
+function Benefits(values) {
 	return uniform({
 		label: "Benefits",
 		type: "set", 
@@ -76,16 +76,16 @@ function benefits(values) {
 
 function rewardSet(cashList, benefitList) {
 	return [
-		rewards(
-			benefits(benefitList.slice(0, 6)), 
-			cash(cashList.slice(0, 6))),
-		rewards(
-			benefits(benefitList.slice(1, 7)),
-			cash(cashList.slice(1, 7))),
+		Rewards(
+			Benefits(benefitList.slice(0, 6)), 
+			Cash(cashList.slice(0, 6))),
+		Rewards(
+			Benefits(benefitList.slice(1, 7)),
+			Cash(cashList.slice(1, 7))),
 	];
 }
 
-function assignment(Career) {
+function Assignment(Career) {
 	return {
 		label: Career.name + " Assignment",
 		type: "set",
@@ -115,14 +115,14 @@ function joinAssignment(Career, asgn) {
 		if (isFirstCareer(state)) {
 			Career.basicTrainingSkills(state).forEach(skill => setSkill(state, skill, 0));
 		} else {
-			enqueue(state, chooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
+			enqueue(state, ChooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
 		}
-		enqueue(state, survival(Career));
+		enqueue(state, Survival(Career));
 	}
 }
 
 
-function survival(Career) {
+function Survival(Career) {
 	function getCheck(state) {
 		const asgn = currentAssignment(state);
 		const check = Career.survive;
@@ -139,20 +139,20 @@ function survival(Career) {
 		],
 		o: [
 			state => {
-				enqueue(state, finish(Career));
+				enqueue(state, FinishCareer(Career));
 				enqueue(state, Term);
 			},
 			state => {
 				incr(state, _TERMS(currentCareer(state)));
 				enqueue(state, Career.Events);
-				enqueue(state, advancement(Career));
+				enqueue(state, Advancement(Career));
 			}
 		],
 		r: () => {},
 	}
 }
 
-function advancement(Career, assignments, stats, values) {
+function Advancement(Career, assignments, stats, values) {
 	function getCheck(state) {
 		const asgn = currentAssignment(state);
 		const check = Career.advance;
@@ -164,7 +164,7 @@ function advancement(Career, assignments, stats, values) {
 		const rankData = Career.ranks[asgn][state.get(_RANK(currentCareer(state)))];
 		state.set(currentCareer(state) + " Title", rankData.title);
 		parseSkill(rankData.bonus)(state);
-		enqueue(state, skillSet(Career), true);
+		enqueue(state, SkillSet(Career), true);
 	}
 	return {
 		label: "Advancement",
@@ -178,18 +178,18 @@ function advancement(Career, assignments, stats, values) {
 		],
 		o: [
 			state => enqueue(state, Term),
-			state => enqueue(state, continueCareer(Career)),
+			state => enqueue(state, ContinueCareer(Career)),
 			state => {
 				advancementSuccess(state);
-				enqueue(state, continueCareer(Career));
+				enqueue(state, ContinueCareer(Career));
 			},
 			state => {
 				advancementSuccess(state);
-				enqueue(state, skillSet(Career));
-				enqueue(state, survival(Career));
+				enqueue(state, SkillSet(Career));
+				enqueue(state, Survival(Career));
 			}
 		],
-		r: state => enqueue(state, finish(Career)),
+		r: state => enqueue(state, FinishCareer(Career)),
 	}
 }
 
@@ -205,7 +205,7 @@ function getBenefits(state, Career) {
 	[...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
 }
 
-function skillSet(Career) {
+function SkillSet(Career) {
 	return {
 		label: "Skill Set",
 		type: "set",
@@ -214,13 +214,13 @@ function skillSet(Career) {
 			state => state.get("EDU") >= 8 && Career.skills[set] != null ? 1 : 0 :
 			state => 1),
 		o: SkillSets.map(set => set == "Assignment" ?
-			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[currentAssignment(state)]), true) :
-			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[set]), true)),
+			state => enqueue(state, ChooseSkill(`${Career.name} ${set} Skills`, Career.skills[currentAssignment(state)]), true) :
+			state => enqueue(state, ChooseSkill(`${Career.name} ${set} Skills`, Career.skills[set]), true)),
 		r: () => {},
 	}
 }
 
-function entry(Career) {
+function Entry(Career) {
 	return {
 		label: Career.name + " Qualification",
 		type: "set",
@@ -229,7 +229,7 @@ function entry(Career) {
 		o: [
 			state => enqueue(state, DrifterOrDraft),
 			state => {
-				enqueue(state, assignment(Career));
+				enqueue(state, Assignment(Career));
 			},
 		],
 		r: () => {},
@@ -243,7 +243,7 @@ function canCareer(state, career, check) {
 	return check;
 }
 
-function continueCareer(Career) {
+function ContinueCareer(Career) {
 	return {
 		label: "Continue Career?",
 		type: "set",
@@ -255,15 +255,15 @@ function continueCareer(Career) {
 				enqueue(state, Term);
 			}, 
 			state => {
-				enqueue(state, skillSet(Career));
-				enqueue(state, survival(Career));
+				enqueue(state, SkillSet(Career));
+				enqueue(state, Survival(Career));
 			},
 		],
 		r: () => {},
 	}
 }
 
-function finish(Career)  {
+function FinishCareer(Career)  {
 	return {
 		label: "Finish?",
 		type: "set",
