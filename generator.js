@@ -166,6 +166,7 @@ function eraseAndRerun(parent, state) {
 }
 
 function enqueue(state, spec, front = false) {
+	if (!spec) throw "spec is not defined";
   if (front) {
     if (!state.has("queue")) {
       state.set("queue", [])
@@ -221,4 +222,3 @@ function run(state) {
   }
   renderState(state);
 }
-

@@ -18,7 +18,7 @@ const Term = {
     state => canPreCareer(state, MARINE_ACADEMY, check2d6(9 - mod(state.get(END)) + 2 * state.get(TERMS))),
     state => canPreCareer(state, NAVY_ACADEMY, check2d6(9 - mod(state.get(INT)) + 2 * state.get(TERMS))),
     state => canCareer(state, AGENT, check2d6(6 - mod(state.get(INT)) + state.get(CAREERS).length)),
-    state => 0.1,
+    state => canCareer(state, DRIFTER, 0.1),
     state => 0.01,
   ],
   o: [
@@ -39,29 +39,12 @@ const DrifterOrDraft = {
   v: [DRIFTER, DRAFT],
   p: [state => 0.5, state => 0.5],
   o: [
-  	state => enqueue(state, DrifterAssignment),
+  	state => enqueue(state, Drifter.Assignment),
     state => enqueue(state, TODO("Draft")),
   ],
   r: () => {},  
 }
 
-const ContinueCareer = {
-	label: "Continue Career?",
-  type: "set",
-  v: ["Leave", "Stay"],
-  p: [0.2, 0.8].map(val => state => val),
-  o: [
-  	state => {
-    	getBenefits(state);
-      enqueue(state, Term);
-    }, 
-  	state => {
-    	enqueue(state, Agent.SkillSet);
-      enqueue(state, Agent.Survival);
-    },
-  ],
-  r: () => {},
-}
 
 const Finish = {
 	label: "Finish?",
@@ -69,7 +52,7 @@ const Finish = {
   v: ["Yes", "No"],
   p: [state => 0.2, state => 0.8],
   o: [
-  	state => {state.set(QUEUE, []); getBenefits(state)},
+  	state => state.set(QUEUE, []),
     () => {}
   ],
   r: state => incr(state, TERMS),

@@ -135,7 +135,7 @@ function survival(Career) {
 		],
 		o: [
 			state => {
-				enqueue(state, Finish);
+				enqueue(state, Career.Finish);
 				enqueue(state, Term);
 			},
 			state => {
@@ -173,11 +173,11 @@ function advancement(Career, assignments, stats, values) {
 			state => 1 / 36,
 		],
 		o: [
-			state => enqueue(state, TODO("Career Change")),
-			state => enqueue(state, ContinueCareer),
+			state => enqueue(state, Term),
+			state => enqueue(state, continueCareer(Career)),
 			state => {
 				advancementSuccess(state);
-				enqueue(state, ContinueCareer);
+				enqueue(state, continueCareer(Career));
 			},
 			state => {
 				advancementSuccess(state);
@@ -185,18 +185,18 @@ function advancement(Career, assignments, stats, values) {
 				enqueue(state, Career.Survival);
 			}
 		],
-		r: state => enqueue(state, Finish),
+		r: state => enqueue(state, Career.Finish),
 	}
 }
 
-function getBenefits(state) {
+function getBenefits(state, Career) {
 	if (isCurrentPreCareer(state)) return;
 	const career = currentCareer(state)
 	const terms = state.get(_TERMS(career));
 	const rank = state.get(_RANK(career));
 	const rankBonus = Math.ceil(rank / 2);
 	const numBenefits = Math.max(0, terms + rankBonus);
-	const set = rewardSet(Agent.cash, Agent.benefits);
+	const set = rewardSet(Career.cash, Career.benefits);
 	const benefitRoll = rank >= 5 ? set[1] : set[0]; 
 	[...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
 }
@@ -207,7 +207,7 @@ function skillSet(Career) {
 		type: "set",
 		v: SkillSets,
 		p: SkillSets.map(set => set == "Advanced Education" ?
-			state => state.get("EDU") >= 8 ? 1 : 0 :
+			state => state.get("EDU") >= 8 && Career.skills[set] != null ? 1 : 0 :
 			state => 1),
 		o: SkillSets.map(set => set == "Assignment" ?
 			state => enqueue(state, chooseSkill(`${Career.name} ${set} Skills`, Career.skills[currentAssignment(state)]), true) :
@@ -237,4 +237,38 @@ function canCareer(state, career, check) {
 		return 0;
 	}
 	return check;
+}
+
+function continueCareer(Career) {
+	return {
+		label: "Continue Career?",
+		type: "set",
+		v: ["Leave", "Stay"],
+		p: [0.2, 0.8].map(val => state => val),
+		o: [
+			state => {
+				getBenefits(state, Career);
+				enqueue(state, Term);
+			}, 
+			state => {
+				enqueue(state, Career.SkillSet);
+				enqueue(state, Career.Survival);
+			},
+		],
+		r: () => {},
+	}
+}
+
+function finish(Career)  {
+	return {
+		label: "Finish?",
+		type: "set",
+		v: ["Yes", "No"],
+		p: [state => 0.2, state => 0.8],
+		o: [
+			state => {state.set(QUEUE, []); getBenefits(state, Career)},
+			() => {}
+		],
+		r: state => incr(state, TERMS),
+	};
 }

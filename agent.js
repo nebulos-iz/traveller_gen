@@ -10,6 +10,7 @@ Agent.skills = {
   "Intelligence": ["Investigate", "Recon", "Electronics (comms)", "Stealth", "Persuade", "Deception"],
   "Corporate": ["Investigate", "Electronics (computers)", "Stealth", "Carouse", "Deception", "Streetwise"],
 };
+Agent.basicTrainingSkills = state => Agent.skills['Service Skills'];
 Agent.cash = [1000, 2000, 5000, 7000, 10000, 25000, 50000];
 Agent.benefits = [SCIENTIFIC_EQUIPMENT, "INT +1", SHIP_SHARE, WEAPON, COMBAT_IMPLANT, "SOC +1", "TAS Membership"];
 Agent.ranks = {
@@ -77,5 +78,5 @@ Agent.Advancement = advancement(Agent);
 Agent.Entry = entry(Agent);
 Agent.Survival = survival(Agent)
 Agent.Assignment = assignment(Agent);
-Agent.basicTrainingSkills = state => Agent.skills['Service Skills'];
 Agent.SkillSet = skillSet(Agent);
+Agent.Finish = finish(Agent);

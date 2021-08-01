@@ -10,6 +10,7 @@ Drifter.skills = {
   "Wanderer": ["Drive", "Deception", "Recon", "Stealth", "Streetwise", "Survival"],
   "Scavenger": ["Pilot (small craft)", "Mechanic", "Astrogation", "Vacc Suit", "Profession", "Gun Combat"],
 };
+Drifter.basicTrainingSkills = state => Drifter.skills[currentAssignment(state)];
 Drifter.cash = [0, 0, 1000, 2000, 3000, 4000, 8000];
 Drifter.benefits = [CONTACT, WEAPON, ALLY, WEAPON, "EDU +1", SHIP_SHARE, [SHIP_SHARE, SHIP_SHARE]];
 Drifter.ranks = {
@@ -78,5 +79,5 @@ Drifter.Advancement = advancement(Drifter);
 Drifter.Entry = entry(Drifter);
 Drifter.Survival = survival(Drifter)
 Drifter.Assignment = assignment(Drifter);
-Drifter.basicTrainingSkills = state => Drifter.skills[currentAssignment(state)];
 Drifter.SkillSet = skillSet(Drifter);
+Drifter.Finish = finish(Drifter);
