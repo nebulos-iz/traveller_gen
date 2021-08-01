@@ -216,7 +216,7 @@ function renderState(state) {
 
 function run(state) {
 	let count = 0;
-  while (count < 50 && state.get("queue").length > 0) {
+  while (count < 100 && state.get("queue").length > 0) {
     doSpec(state);
     count++;
   }

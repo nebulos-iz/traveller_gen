@@ -36,7 +36,7 @@ Drifter.ranks = {
     0: tb(),
     1: tb("", "Vacc Suit 1"),
     2: tb(),
-    3: tb("", "Mechanic 1"), /* or Professor (belter) 1 */
+    3: tb("", "Mechanic 1"), /* or Profession (belter) 1 */
     4: tb(),
     5: tb(),
     6: tb(),

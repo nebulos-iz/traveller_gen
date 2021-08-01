@@ -67,6 +67,7 @@ function parseStat(str) {
 }
 
 function parseSkill(str) {
+	if (str == "") return () => {};
 	const stat = parseStat(str);
 	if (stat != null) {
 		return stat;
@@ -80,6 +81,7 @@ function parseSkill(str) {
 }
 
 function parseBenefit(str) {
+	if (str == "") return () => {};
 	if (Array.isArray(str)) {
 		return state => str.forEach(s => parseBenefit(s)(state));
 	}
@@ -87,7 +89,7 @@ function parseBenefit(str) {
 	if (parseStat(str) != null) {
 		return stat;
 	}
-	return state => append(state, ASSETS, str.substring(1));
+	return state => append(state, ASSETS, str);
 }
 
 function currentCareer(state) {
