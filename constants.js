@@ -66,4 +66,6 @@ const SHIP_SHARE = "Ship Share";
 const SCIENTIFIC_EQUIPMENT = "Scientific Equipment";
 const COMBAT_IMPLANT = "Combat Implant";
 
-const _DRAFTED = "_Drafted"
+const _DRAFTED = "_Drafted";
+
+const _PRINT = "_print";

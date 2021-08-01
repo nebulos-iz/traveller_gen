@@ -16,14 +16,6 @@ function generator(generatorFunctions) {
     const savedState = copyMap(state);
     const randomValue = doRandom(spec);
 
-    function run(state, spec, value) {
-      state.get("queue").shift();
-      doOutcome(state, spec, value);
-      spec.r(state);
-      if (spec.debug) {
-      	console.log(spec.label, spec.p.map(p => p(state)));
-      }
-    }
     const container = dom(log, "c", );
     const label = dom(container, "", spec.label);
     const input = doRender(spec, randomValue);
@@ -33,6 +25,19 @@ function generator(generatorFunctions) {
       run(state, spec, doSelect(e));
       eraseAndRerun(container, state);
     });
+		const text = dom(container, "");
+    function run(state, spec, value) {
+      state.get("queue").shift();
+      doOutcome(state, spec, value);
+      spec.r(state);
+      if (spec.debug) {
+      	console.log(spec.label, spec.p.map(p => p(state)));
+      }
+			if (state.has(_PRINT)) {
+				text.innerHTML = state.get(_PRINT);
+				state.delete(_PRINT);
+			}
+    }
     run(state, spec, randomValue);
     return container;
   }
