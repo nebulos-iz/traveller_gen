@@ -62,7 +62,6 @@ const Draft = uniform({
 	},
 });
 
-
 const Finish = {
 	label: "Finish?",
   type: "set",

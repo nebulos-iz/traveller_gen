@@ -112,10 +112,12 @@ function startAssignment(Career, asgn) {
 			state.set(`${currentCareer(state)} Title`, title);
 		}
 		// Basic training
+		const skills = Career.basicTrainingSkills(state);
 		if (isFirstCareer(state)) {
-			Career.basicTrainingSkills(state).forEach(skill => setSkill(state, skill, 0));
+			skills.forEach(skill => setSkill(state, skill, 0));
+			state.set(_PRINT, "Gained basic training skills " + skills.join(", "));
 		} else {
-			enqueue(state, ChooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
+			enqueue(state, ChooseSkill(Career.name + " Basic Training", skills));
 		}
 		enqueue(state, Survival(Career));
 	}
@@ -162,7 +164,10 @@ function Advancement(Career, assignments, stats, values) {
 		const asgn = currentAssignment(state);
 		incr(state, _RANK(currentCareer(state)));
 		const rankData = Career.ranks[asgn][state.get(_RANK(currentCareer(state)))];
-		state.set(currentCareer(state) + " Title", rankData.title);
+		if (rankData.title != "") {
+			state.set(currentCareer(state) + " Title", rankData.title);
+			state.set(_PRINT, "Promoted to " + rankData.title);
+		}
 		parseSkill(rankData.bonus)(state);
 		enqueue(state, SkillSet(Career), true);
 	}
@@ -202,6 +207,7 @@ function getBenefits(state, Career) {
 	const numBenefits = Math.max(0, terms + rankBonus);
 	const set = rewardSet(Career.cash, Career.benefits);
 	const benefitRoll = rank >= 5 ? set[1] : set[0]; 
+	if (numBenefits > 0) state.set(_PRINT, `Retired with ${numBenefits} benefits`);
 	[...Array(numBenefits)].forEach(x => enqueue(state, benefitRoll));
 }
 

@@ -12,6 +12,7 @@ function generator(generatorFunctions) {
   const doRandom = generatorFunctions.random;
   const doRender = generatorFunctions.render;
   const doSelect = generatorFunctions.select;
+	const doValue = generatorFunctions.idxToValue;
   return (state, spec) => {
     const savedState = copyMap(state);
     const randomValue = doRandom(spec);
@@ -37,6 +38,9 @@ function generator(generatorFunctions) {
 				text.innerHTML = state.get(_PRINT);
 				state.delete(_PRINT);
 			}
+			if (spec.t) {
+				text.innerHTML = spec.t(doValue(spec, value), value);
+			}
     }
     run(state, spec, randomValue);
     return container;
@@ -53,6 +57,7 @@ const freeform = generator({
     return input;
   },
   select: e => e.target.value,
+	idxToValue: (spec, idx) => idx,
 });
 
 const set = generator({
@@ -87,6 +92,7 @@ const set = generator({
     return input;
   },
   select: e => e.target.selectedIndex,
+	idxToValue: (spec, idx) => spec.v[idx],
 });
 
 const pick = generator({
@@ -127,7 +133,7 @@ const pick = generator({
     return input;
   },
   select: e => [...e.target.selectedOptions].map(opt => opt.index),
-
+	idxToValue: (spec, idx) => idx.map(i => spec.v[i]),
 });
 
 // When the user makes changes to the selected value, roll back to the log value, change the state.

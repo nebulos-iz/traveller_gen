@@ -30,5 +30,6 @@ const BackgroundSkills = uniform({
   o: background_skills.map(skill => (state => setSkill(state, skill, 0))),
   n: 4,
   r: () => {},
+	t: values => `Learned ${values.join(", ")}`,
 });
 
