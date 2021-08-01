@@ -75,9 +75,3 @@ Drifter.Events = {
   }, (x, i) => state => enqueue(state, TODO("Drifter Events " + i), true)),
   r: () => {},
 }
-Drifter.Advancement = advancement(Drifter);
-Drifter.Entry = entry(Drifter);
-Drifter.Survival = survival(Drifter)
-Drifter.Assignment = assignment(Drifter);
-Drifter.SkillSet = skillSet(Drifter);
-Drifter.Finish = finish(Drifter);

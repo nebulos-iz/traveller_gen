@@ -111,7 +111,7 @@ function assignment(Career) {
 			} else {
 				enqueue(state, chooseSkill(Career.name + " Basic Training", Career.basicTrainingSkills(state)));
 			}
-			enqueue(state, Career.Survival);
+			enqueue(state, survival(Career));
 		}),
 		r: state => {},
 	}
@@ -135,13 +135,13 @@ function survival(Career) {
 		],
 		o: [
 			state => {
-				enqueue(state, Career.Finish);
+				enqueue(state, finish(Career));
 				enqueue(state, Term);
 			},
 			state => {
 				incr(state, _TERMS(currentCareer(state)));
 				enqueue(state, Career.Events);
-				enqueue(state, Career.Advancement)
+				enqueue(state, advancement(Career));
 			}
 		],
 		r: () => {},
@@ -160,7 +160,7 @@ function advancement(Career, assignments, stats, values) {
 		const rankData = Career.ranks[asgn][state.get(_RANK(currentCareer(state)))];
 		state.set(currentCareer(state) + " Title", rankData.title);
 		parseSkill(rankData.bonus)(state);
-		enqueue(state, Career.SkillSet, true);
+		enqueue(state, skillSet(Career), true);
 	}
 	return {
 		label: "Advancement",
@@ -181,11 +181,11 @@ function advancement(Career, assignments, stats, values) {
 			},
 			state => {
 				advancementSuccess(state);
-				enqueue(state, Career.SkillSet);
-				enqueue(state, Career.Survival);
+				enqueue(state, skillSet(Career));
+				enqueue(state, survival(Career));
 			}
 		],
-		r: state => enqueue(state, Career.Finish),
+		r: state => enqueue(state, finish(Career)),
 	}
 }
 
@@ -225,7 +225,7 @@ function entry(Career) {
 		o: [
 			state => enqueue(state, DrifterOrDraft),
 			state => {
-				enqueue(state, Career.Assignment);
+				enqueue(state, assignment(Career));
 			},
 		],
 		r: () => {},
@@ -251,8 +251,8 @@ function continueCareer(Career) {
 				enqueue(state, Term);
 			}, 
 			state => {
-				enqueue(state, Career.SkillSet);
-				enqueue(state, Career.Survival);
+				enqueue(state, skillSet(Career));
+				enqueue(state, survival(Career));
 			},
 		],
 		r: () => {},

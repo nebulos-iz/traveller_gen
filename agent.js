@@ -74,9 +74,3 @@ Agent.Events = {
   }, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
   r: () => {},
 }
-Agent.Advancement = advancement(Agent);
-Agent.Entry = entry(Agent);
-Agent.Survival = survival(Agent)
-Agent.Assignment = assignment(Agent);
-Agent.SkillSet = skillSet(Agent);
-Agent.Finish = finish(Agent);
