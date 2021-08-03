@@ -90,3 +90,27 @@ Drifter.Events = {
 		][idx];
 	},
 }
+Drifter.Mishaps = uniform({
+	label: "Agent Mishaps",
+	type: "set",
+	v: [
+		"Severe Injury",
+		"Injury",
+		"Enemy",
+		"Illness",
+		"Betrayal",
+		"Amnesia",
+	],
+  o: Array.from({length: 11}, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
+	r: () => {},
+	t: (_, idx) => {
+		return [
+			"Severely injured (this is the same as a result of 2 on the Injury Table). Alternatively, roll twice on the Injury Table and take the lower result.",
+			"Injured. Roll on the Injury Table.",
+			"You run afoul of a criminal gang, corrupt bureaucrat or other foe. Gain an Enemy.",
+			"You suffer from a life-threatening illness. Reduce your END by 1.",
+			"Betrayed by a friend. One of your Contacts or Allies betrays you, ending your career. That Contact or Ally becomes a Rival or Enemy. If you have no Contacts or Allies, then you are betrayed by someone you never saw coming and still gain a Rival or Enemy. In addition, roll 2D. If you roll 2, you must take the Prisoner career in your next term.",
+			"You do not know what happened to you. There is a gap in your memory",
+		][idx];
+	},
+})

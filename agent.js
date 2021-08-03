@@ -69,9 +69,7 @@ Agent.Events = {
     "Conspiracy Discovered",
   ],
   p: p_2d6,
-  o: Array.from({
-    length: 11
-  }, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
+  o: Array.from({length: 11}, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
   r: () => {},
 	t: (_, idx) => {
 		return ["Roll on the Mishap Table, but you are not ejected from this career.",
@@ -88,3 +86,27 @@ Agent.Events = {
 		][idx];
 	}
 }
+Agent.Mishaps = uniform({
+	label: "Agent Mishaps",
+	type: "set",
+	v: [
+		"Severe Injury",
+		"Unpleasant Deal",
+		"Career Ruining Investigation",
+		"Know Too Much",
+		"Close to Home",
+		"Injury",
+	],
+  o: Array.from({length: 11}, (x, i) => state => enqueue(state, TODO("Agent Mishaps " + i), true)),
+	r: () => {},
+	t: (_, idx) => {
+		return [
+			"Severely injured (this is the same as a result of 2 on the Injury Table). Alternatively, roll twice on the Injury Table and take the lower result.",
+			"A criminal or other figure under investigation offers you a deal. Accept, and you leave this career without further penalty (although you lose the Benefit roll as normal). Refuse, and you must roll twice on the Injury Table and take the lower result. You gain an Enemy and one level in any skill you choose.",
+			"An investigation goes critically wrong or leads to the top, ruining your career. Roll Advocate 8+. If you succeed, you may keep the Benefit roll from this term. If you roll 2, you must take the Prisoner career in your next term.",
+			"You learn something you should not know, and people want to kill you for it. Gain an Enemy and Deception 1.",
+			"Your work ends up coming home with you, and someone gets hurt. Choose one of your Contacts, Allies or family members, and roll twice on the Injury Table for them, taking the lower result.",
+			"Injured. Roll on the Injury Table.",
+		][idx];
+	},
+})

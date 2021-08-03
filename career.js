@@ -141,6 +141,7 @@ function Survival(Career) {
 		],
 		o: [
 			state => {
+				enqueue(state, Career.Mishaps);
 				enqueue(state, FinishCareer(Career));
 				enqueue(state, Term);
 			},
