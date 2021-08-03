@@ -57,7 +57,7 @@ Agent.Events = {
   label: "Agent Events",
   type: "set",
   v: ["Disaster!",
-    "Dangerous Investigation.",
+    "Dangerous Investigation",
     "Successful Missions",
     "Contact Networks",
     "Advanced Training",
@@ -69,11 +69,24 @@ Agent.Events = {
     "Conspiracy Discovered",
   ],
   p: p_2d6,
-  o: Array.from({length: 11}, (x, i) => state => enqueue(state, TODO("Agent Events " + i), true)),
+  o: [
+		state => enqueue(state, Agent.Mishaps, true),
+		state => enqueue(state, DangerousInvestigation(state), true),
+		state => enqueue(state, TODO("Agent Events " + 3), true),
+		state => enqueue(state, TODO("Agent Events " + 4), true),
+		state => enqueue(state, TODO("Agent Events " + 5), true),
+		state => enqueue(state, TODO("Agent Events " + 6), true),
+		state => enqueue(state, TODO("Agent Events " + 7), true),
+		state => enqueue(state, TODO("Agent Events " + 8), true),
+		state => enqueue(state, TODO("Agent Events " + 9), true),
+		state => enqueue(state, TODO("Agent Events " + 10), true),
+		state => enqueue(state, TODO("Agent Events " + 11), true),
+		state => enqueue(state, TODO("Agent Events " + 12), true),
+	],
   r: () => {},
 	t: (_, idx) => {
 		return ["Roll on the Mishap Table, but you are not ejected from this career.",
-			"An investigation takes on a dangerous turn. Roll Investigate 8+ or Streetwise 8+. If you fail, roll on the Mishap Table. If you succeed, increase one of these skills by one level: Deception, Jack-of-all-Trades, Persuade or Tactics.",
+			"An investigation takes on a dangerous turn.",
 			"You complete a mission for your superiors, and are suitably rewarded. Gain DM+1 to any one Benefit roll from this career.",
 			"You establish a network of contacts. Gain D3 Contacts.",
 			"You are given advanced training in a specialist field. Roll EDU 8+ to increase any one skill you already have by one level.",
@@ -110,3 +123,18 @@ Agent.Mishaps = uniform({
 		][idx];
 	},
 })
+
+function DangerousInvestigation(state) {
+	const checkSkill = get(state, "Investigate") > get(state, "Streetwise") ? "Investigate" : "Streetwise";
+	return {
+		label: "Dangerous Investigation",
+		type: "set",
+		v: ["Failure", "Success"],
+		p: binary(state => check2d6(8 - get(state, checkSkill))),
+		o: [
+			state => enqueue(state, Agent.Mishaps, true),
+			state => enqueue(state, ChooseSkill("Event Success", ["Deception", "Jack-of-all-Trades", "Persuade", "Tactics"]), true),
+		],
+		r: () => {},
+	};
+}
