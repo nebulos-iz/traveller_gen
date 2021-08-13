@@ -7,6 +7,7 @@ const NAVY_ACADEMY = "Army Academy";
 const MARINE_ACADEMY = "Marine Academy";
 const ARMY_ACADEMY = "Navy Academy";
 const AGENT = "Agent";
+const ARMY = "Army";
 const DRIFTER = "Drifter";
 const DRAFT = "Draft";
 
@@ -21,11 +22,16 @@ const QUEUE = "queue";
 
 const SkillSets = ["Personal Development", "Service Skills", "Advanced Education", "Assignment"];
 const PreCareers = [UNIVERSITY, NAVY_ACADEMY, MARINE_ACADEMY, ARMY_ACADEMY];
+const MilitaryCareers = [ARMY];
 
 const _CASH_TAKEN = "_Cash_Taken";
 
 function _RANK(career) {
 	return `_${career}_Ranks`;
+}
+
+function _EXTRA_RANK(career) {
+	return `_${career}_ExtraRanks`;
 }
 
 function _TERMS(career) {
@@ -59,12 +65,18 @@ function _EXTRA_SKILLS(career) {
   return `_${career}_ExtraSkills`;
 }
 
+function _COMMISSION(career) {
+	return `_${career}_Commission`;
+}
+
+
 const WEAPON = "Weapon";
 const CONTACT = "Contact";
 const ALLY = "Ally";
 const SHIP_SHARE = "Ship Share";
 const SCIENTIFIC_EQUIPMENT = "Scientific Equipment";
 const COMBAT_IMPLANT = "Combat Implant";
+const ARMOR = "Armor";
 
 const _DRAFTED = "_Drafted";
 

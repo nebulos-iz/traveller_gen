@@ -107,7 +107,7 @@ function startAssignment(Career, asgn) {
 		const career = currentCareer(state);
 		state.set(_TERMS(career), 0);
 		state.set(_RANK(career), 0);
-		const title = Career.ranks[asgn][0].title;
+		const title = getRankData(Career, state).title;
 		if (title != "") {
 			state.set(`${currentCareer(state)} Title`, title);
 		}
@@ -130,7 +130,6 @@ function Survival(Career) {
 		const check = Career.survive;
 		return check2d6(check[asgn].value - mod(state.get(check[asgn].stat)));
 	}
-
 	return {
 		label: Career.name + " Survival",
 		type: "set",
@@ -148,12 +147,52 @@ function Survival(Career) {
 			state => {
 				incr(state, _TERMS(currentCareer(state)));
 				enqueue(state, Career.Events);
-				enqueue(state, Advancement(Career));
+				if (MilitaryCareers.includes(currentCareerOnly(state))) {
+					enqueue(state, Commission(Career));
+				} else {
+					enqueue(state, Advancement(Career));
+				}
 			}
 		],
 		r: () => {},
 	}
 }
+
+function Commission(Career) {
+	return {
+		label: Career.name + " Commission",
+		type: "set",
+		v: ["Failed", "Succeeded"],
+		p: binary(state => check2d6(9 - mod(state.get(SOC)) 
+																	- get(state, _DM_COMMISSION(Career.name)))),
+		o: [
+			state => enqueue(state, Advancement(Career)),
+			state => {
+				const career = currentCareer(state);
+				state.set(_COMMISSION(career), 1);
+				state.set(_EXTRA_RANK(career), get(state, _RANK(career)));
+				state.set(_RANK(career), 1);
+				const rankData = getRankData(Career, state);
+				if (rankData.title != "") {
+					state.set(career + " Title", rankData.title);
+					state.set(_PRINT, "Promoted to " + rankData.title);
+				}
+				enqueue(state, ContinueCareer(Career));
+			},
+		],
+		r: () => {},
+	}
+}
+
+function getRankData(Career, state) {
+	const career = currentCareer(state);
+	const rank = state.get(_RANK(career));
+	const rankKey = MilitaryCareers.includes(currentCareerOnly(state))
+		? (state.has(_COMMISSION(career)) ? "Officer" : "Enlisted")
+		: currentAssignment(state);
+	return Career.ranks[rankKey][rank]
+}
+
 
 function Advancement(Career, assignments, stats, values) {
 	function getCheck(state) {
@@ -164,7 +203,7 @@ function Advancement(Career, assignments, stats, values) {
 	function advancementSuccess(state) {
 		const asgn = currentAssignment(state);
 		incr(state, _RANK(currentCareer(state)));
-		const rankData = Career.ranks[asgn][state.get(_RANK(currentCareer(state)))];
+		const rankData = getRankData(Career, state);
 		if (rankData.title != "") {
 			state.set(currentCareer(state) + " Title", rankData.title);
 			state.set(_PRINT, "Promoted to " + rankData.title);
@@ -203,7 +242,7 @@ function getBenefits(state, Career) {
 	if (isCurrentPreCareer(state)) return;
 	const career = currentCareer(state)
 	const terms = state.get(_TERMS(career));
-	const rank = state.get(_RANK(career));
+	const rank = get(state, _RANK(career)) + get(state, _EXTRA_RANK(career));
 	const rankBonus = Math.ceil(rank / 2);
 	const numBenefits = Math.max(0, terms + rankBonus);
 	const set = rewardSet(Career.cash, Career.benefits);
@@ -235,9 +274,7 @@ function Entry(Career) {
 		p: binary(state => check2d6(Career.enter.value - mod(state.get(Career.enter.stat)) - get(state, _DM_ENTRY(Career.name)))),
 		o: [
 			state => enqueue(state, DrifterOrDraft),
-			state => {
-				enqueue(state, Assignment(Career));
-			},
+			state => enqueue(state, Assignment(Career)),
 		],
 		r: () => {},
 	}

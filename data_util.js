@@ -57,10 +57,18 @@ function get(state, attr, val = 0) {
 }
 
 function parseStat(str) {
-	for (const char of characteristics) {
-		if (str.startsWith(char)) {
+	for (const chr of characteristics) {
+		if (str.startsWith(chr)) {
+			if (str.includes(">")) {
+				const numbers = str.split("+")[1];
+				const increaseBy = parseInt(str.split(">")[0]);
+				const increaseTo = parseInt(str.split(">")[1]);
+				return state => state.get(chr) >= increaseTo 
+					? incr(state, chr, increaseBy) 
+					: state.set(chr, increaseTo);
+			}
 			const val = parseInt(str.split("+")[1]);
-			return state => incr(state, char, val);
+			return state => incr(state, chr, val);
 		}
 	}
 	return null
@@ -80,8 +88,14 @@ function parseSkill(str) {
   return state => incr(state, str);
 }
 
+function OR(arr) {
+	return arr.join(" OR ");
+}
 function parseBenefit(str) {
 	if (str == "") return () => {};
+	if (str.includes("OR")) {
+		return state => str.split(' OR ').forEach(s => parseBenefit(s)(state));
+	}
 	if (Array.isArray(str)) {
 		return state => str.forEach(s => parseBenefit(s)(state));
 	}
@@ -94,6 +108,10 @@ function parseBenefit(str) {
 
 function currentCareer(state) {
 	return state.get(CAREERS).slice(-1)[0];
+}
+
+function currentCareerOnly(state) {
+	return currentCareer(state).split("/")[0];
 }
 
 function currentAssignment(state) {
