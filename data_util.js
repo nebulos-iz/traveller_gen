@@ -127,3 +127,14 @@ function isFirstCareer(state) {
 function isCurrentPreCareer(state) {
 	return PreCareers.some(pre => currentCareer(state).startsWith(pre));
 }
+
+function addModifier(state, roll, val) {
+	if (!state.has(MODIFIERS)) {
+		state.set(MODIFIERS, new Map());
+	}
+	const modifiers = state.get(MODIFIERS);
+	if (!modifiers.has(roll)) {
+		modifiers[roll] = [];
+	}
+	modifiers[roll].append(val);
+}

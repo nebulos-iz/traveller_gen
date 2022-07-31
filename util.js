@@ -13,6 +13,8 @@ function setMapTo(oldMap, newMap) {
   for (let [key, value] of newMap) {
     if (Array.isArray(value)) {
       oldMap.set(key, value.slice());
+    } else if (value instanceof Map) {
+      oldMap.set(key, copyMap(value));
     } else {
       oldMap.set(key, value);
     }
@@ -25,6 +27,8 @@ function copyMap(map) {
   for (let [key, value] of newMap) {
     if (Array.isArray(value)) {
       newMap.set(key, value.slice());
+    } else if (value instanceof Map) {
+      newMap.set(key, copyMap(value));
     }
   }
   return newMap;

@@ -234,21 +234,30 @@ function Advancement(Career, assignments, stats, values) {
 			state => getCheck(state) - 1 / 36,
 			state => 1 / 36,
 		],
-		b: state => enqueue(state.Finish),
 		o: [
-			state => enqueue(state, Term),
-			state => enqueue(state, ContinueCareer(Career)),
 			state => {
-				advancementSuccess(state);
+				enqueue(state, Finish);
+				enqueue(state, Term);
+			},
+			state => {
 				enqueue(state, ContinueCareer(Career));
+				enqueue(state, Finish);
 			},
 			state => {
 				advancementSuccess(state);
+				enqueue(state, ContinueCareer(Career));
+				enqueue(state, Finish);
+			},
+			state => {
+				advancementSuccess(state);
+				enqueue(state, Finish);
 				enqueue(state, SkillSet(Career));
 				enqueue(state, Survival(Career));
 			}
 		],
-		r: () => {},
+		r: state => {
+
+		},
 	}
 }
 
@@ -322,19 +331,4 @@ function ContinueCareer(Career) {
 		],
 		r: () => {},
 	}
-}
-
-function FinishCareer(Career)  {
-	return {
-		label: `Finish ${Career.name} Career?`,
-		type: "set",
-		v: ["Yes", "No"],
-		p: [state => state.get(TERMS) + 1, state => 2],
-		o: [
-			// Note: Probably also update Survival Fail.
-			state => {state.set(QUEUE, []); getBenefits(state, Career)},
-			() => {}
-		],
-		r: state => incr(state, TERMS),
-	};
 }
