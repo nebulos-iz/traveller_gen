@@ -10,6 +10,7 @@ function canPreCareer(state, precareer, check) {
 }
 
 const PreCareerEvents = {
+  id: 'pre-career',
   label: "Pre-Career Events",
   type: "set",
   v: [
@@ -58,6 +59,7 @@ const PreCareerEvents = {
 }
 
 const PreCareerPrank = {
+  id: 'precareer-prank',
   label: "Prank Gone Wrong",
   type: "set",
   v: ["Imprisoned", "Enemy", "Rival"],
@@ -75,6 +77,7 @@ const PreCareerPrank = {
 }
 
 const PreCareerFriends = uniform({
+  id: 'precareer-friends',
   label: "School Friends",
   type: "set",
   v: [...Array(3).keys()].map(x => x + 1),
@@ -83,6 +86,7 @@ const PreCareerFriends = uniform({
 });
 
 const PreCareerMovement = {
+  id: 'precareer-movement',
   label: "Pre Career Movement Leadership",
   type: "set",
   v: ["Failure", "Success"],
@@ -102,6 +106,7 @@ const PreCareerMovement = {
 }
 
 const UniversityEntry = {
+  id: 'university-entry',
   label: "University Entry",
   type: "set",
   v: ["Failed", "Succeeded"],
@@ -126,6 +131,7 @@ const UniversityEntry = {
 const entryBenefits = ["Agent", "Army", "Citizen (corporate)", "Entertainer (journalist)", "Marines", "Navy", "Scholar", "Scouts", "Commission"];
 const universityGradCheck = val => check2d6(val - mod(state.get(INT)) - get(state, _DM_GRADUATE));
 const UniversityGraduation = {
+  id: 'university-graduation',
   label: "University Graduation",
   type: "set",
   v: ["Failed", "Succeeded", "Honors"],
@@ -159,6 +165,7 @@ const UniversityGraduation = {
 
 const university_skills = ["Admin", "Advocate", "Animals (training or veterinary)", "Art (any)", "Astrogation", "Electronics (any)", "Engineer (any)", "Language (any)", "Medic", "Navigation", "Profession (any)", "Science (any)"];
 const UniversitySkills = uniform({
+  id: 'university-skills',
   label: "University Skills",
   type: "pick",
   v: university_skills,
@@ -168,6 +175,7 @@ const UniversitySkills = uniform({
 	t: values => `Learned ${values.join(" and ")}`,
 });
 const UniversitySkillsGrad = uniform({
+  id: 'university-skills-graduated',
   label: "University Skills",
   type: "pick",
   v: university_skills,
@@ -179,6 +187,7 @@ const UniversitySkillsGrad = uniform({
 
 function academyEntry(branch, char, value, skills, gradSpec) {
   return {
+    id: 'academy-entry',
     label: branch + " Entry",
     type: "set",
     v: ["Failed", "Succeeded"],
@@ -213,6 +222,7 @@ function academyGraduation(branch) {
       get(state, _DM_GRADUATE));
   }
   return {
+    id: 'branch-graduation',
     label: branch + " Graduation",
     type: "set",
     v: ["Kicked Out", "Failed", "Succeeded", "Honors"],

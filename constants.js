@@ -45,6 +45,7 @@ function _CASGN(career, assignment) {
 function _DM_ENTRY(career) {
 	return `_DM_Entry_${career}`;
 }
+
 const _DM_GRADUATE = "_DM_Graduate";
 function _DM_COMMISSION(branch) {
 	return `_DM_Commission_${branch}`;

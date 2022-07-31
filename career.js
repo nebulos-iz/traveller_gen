@@ -14,6 +14,7 @@ function check(stat, value) {
 
 function TODO(label = "TODO") {
 	return {
+		id: 'todo ' + label,
 		label: label,
 		type: "set",
 		v: ["TODO"],
@@ -29,6 +30,7 @@ function TODO(label = "TODO") {
 
 function ChooseSkill(label, skills) {
 	return uniform({
+		id: 'choose-skill-' + label,
 		label: label,
 		type: "set",
 		v: skills,
@@ -39,6 +41,7 @@ function ChooseSkill(label, skills) {
 
 function Rewards(benefits, cash) {
 	return  {
+		id: 'benefits-or-cash',
 		label: "Benefit Or Cash",
 		type: "set",
 		v: ["Benefit", "Cash"],
@@ -56,6 +59,7 @@ function Rewards(benefits, cash) {
 
 function Cash(values) {
 	return uniform({
+		id: 'cash',
 		label: "Cash",
 		type: "set", 
 		v: values,
@@ -66,6 +70,7 @@ function Cash(values) {
 
 function Benefits(values) {
 	return uniform({
+		id: 'benefits',
 		label: "Benefits",
 		type: "set", 
 		v: values,
@@ -87,6 +92,7 @@ function rewardSet(cashList, benefitList) {
 
 function Assignment(Career) {
 	return {
+		id: 'assignment-' + Career.name,
 		label: Career.name + " Assignment",
 		type: "set",
 		v: Career.assignments,
@@ -131,6 +137,7 @@ function Survival(Career) {
 		return check2d6(check[asgn].value - mod(state.get(check[asgn].stat)));
 	}
 	return {
+		id: 'survival-' + Career.name,
 		label: Career.name + " Survival",
 		type: "set",
 		v: ["Failure", "Success"],
@@ -140,8 +147,10 @@ function Survival(Career) {
 		],
 		o: [
 			state => {
+				state.set(QUEUE, []);
 				enqueue(state, Career.Mishaps);
-				enqueue(state, FinishCareer(Career));
+				getBenefits(state, Career);
+				enqueue(state, Finish);
 				enqueue(state, Term);
 			},
 			state => {
@@ -160,6 +169,7 @@ function Survival(Career) {
 
 function Commission(Career) {
 	return {
+		id: 'comission-' + Career.name,
 		label: Career.name + " Commission",
 		type: "set",
 		v: ["Failed", "Succeeded"],
@@ -177,6 +187,8 @@ function Commission(Career) {
 					state.set(career + " Title", rankData.title);
 					state.set(_PRINT, "Promoted to " + rankData.title);
 				}
+				// Can't do advancement, run the advancement stuff now.
+				enqueue(state, Finish);
 				enqueue(state, ContinueCareer(Career));
 			},
 		],
@@ -212,15 +224,17 @@ function Advancement(Career, assignments, stats, values) {
 		enqueue(state, SkillSet(Career), true);
 	}
 	return {
-		label: "Advancement",
+		id: 'advancement-' + Career.name,
+		label: Career.name + " Advancement",
 		type: "set",
-		v: ["Career Change", "Failure", "Success", "Career Continue"],
+		v: ["Forced Leave", "Failure", "Success", "Forced Continue"],
 		p: [
 			state => check2d6(14 - state.get(_TERMS(currentCareer(state)))),
 			state => Math.max(0, 1 - getCheck(state) - check2d6(14 - state.get(_TERMS(currentCareer(state))))),
 			state => getCheck(state) - 1 / 36,
 			state => 1 / 36,
 		],
+		b: state => enqueue(state.Finish),
 		o: [
 			state => enqueue(state, Term),
 			state => enqueue(state, ContinueCareer(Career)),
@@ -234,7 +248,7 @@ function Advancement(Career, assignments, stats, values) {
 				enqueue(state, Survival(Career));
 			}
 		],
-		r: state => enqueue(state, FinishCareer(Career)),
+		r: () => {},
 	}
 }
 
@@ -253,7 +267,8 @@ function getBenefits(state, Career) {
 
 function SkillSet(Career) {
 	return {
-		label: "Skill Set",
+		id: 'skill-set-' + Career.name,
+		label: Career.name + " Skill Set",
 		type: "set",
 		v: SkillSets,
 		p: SkillSets.map(set => set == "Advanced Education" ?
@@ -268,6 +283,7 @@ function SkillSet(Career) {
 
 function Entry(Career) {
 	return {
+		id: 'qualification-'+ Career.name,
 		label: Career.name + " Qualification",
 		type: "set",
 		v: ["Failed", "Succeeded"],
@@ -289,7 +305,8 @@ function canCareer(state, career, check) {
 
 function ContinueCareer(Career) {
 	return {
-		label: "Continue Career?",
+		id: 'continue-career-' + Career.name,
+		label: `Continue ${Career.name} Career?`,
 		type: "set",
 		v: ["Leave", "Stay"],
 		p: [0.2, 0.8].map(val => state => val),
@@ -309,11 +326,12 @@ function ContinueCareer(Career) {
 
 function FinishCareer(Career)  {
 	return {
-		label: "Finish?",
+		label: `Finish ${Career.name} Career?`,
 		type: "set",
 		v: ["Yes", "No"],
 		p: [state => state.get(TERMS) + 1, state => 2],
 		o: [
+			// Note: Probably also update Survival Fail.
 			state => {state.set(QUEUE, []); getBenefits(state, Career)},
 			() => {}
 		],

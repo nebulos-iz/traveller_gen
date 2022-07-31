@@ -21,12 +21,13 @@ function generator(generatorFunctions) {
     const label = dom(container, "", spec.label);
     const input = doRender(spec, randomValue);
     container.appendChild(input);
+		const text = dom(container, "");
     input.addEventListener('change', e => {
       setMapTo(state, savedState);
+      text.innerHTML = '';
       run(state, spec, doSelect(e));
       eraseAndRerun(container, state);
     });
-		const text = dom(container, "");
     function run(state, spec, value) {
       state.get("queue").shift();
       doOutcome(state, spec, value);

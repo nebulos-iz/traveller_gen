@@ -3,44 +3,44 @@ const Agent = {
 };
 Agent.assignments = ["Law Enforcement", "Intelligence", "Corporate"];
 Agent.skills = {
-  "Personal Development": ["Gun Combat", "DEX +1", "END +1", "Melee", "INT +1", "Athletics"],
-  "Service Skills": ["Streetwise", "Drive", "Investigate", "Flyer", "Recon", "Gun Combat"],
-  "Advanced Education": ["Advocate", "Language", "Explosives", "Medic", "Vacc Suit", "Electronics"],
-  "Law Enforcement": ["Investigate", "Recon", "Streetwise", "Stealth", "Melee", "Advocate"],
-  "Intelligence": ["Investigate", "Recon", "Electronics (comms)", "Stealth", "Persuade", "Deception"],
-  "Corporate": ["Investigate", "Electronics (computers)", "Stealth", "Carouse", "Deception", "Streetwise"],
+	"Personal Development": ["Gun Combat", "DEX +1", "END +1", "Melee", "INT +1", "Athletics"],
+	"Service Skills": ["Streetwise", "Drive", "Investigate", "Flyer", "Recon", "Gun Combat"],
+	"Advanced Education": ["Advocate", "Language", "Explosives", "Medic", "Vacc Suit", "Electronics"],
+	"Law Enforcement": ["Investigate", "Recon", "Streetwise", "Stealth", "Melee", "Advocate"],
+	"Intelligence": ["Investigate", "Recon", "Electronics (comms)", "Stealth", "Persuade", "Deception"],
+	"Corporate": ["Investigate", "Electronics (computers)", "Stealth", "Carouse", "Deception", "Streetwise"],
 };
 Agent.basicTrainingSkills = state => Agent.skills['Service Skills'];
 Agent.cash = [1000, 2000, 5000, 7000, 10000, 25000, 50000];
 Agent.benefits = [SCIENTIFIC_EQUIPMENT, "INT +1", SHIP_SHARE, WEAPON, COMBAT_IMPLANT, "SOC +1", "TAS Membership"];
 Agent.ranks = {
 	"Law Enforcement": {
-    0: tb("Rookie"),
-    1: tb("Corporal", "Streetwise 1"),
-    2: tb("Sergeant"),
-    3: tb("Detective"),
-    4: tb("Lieutenant", "Investigate 1"),
-    5: tb("Chief", "Admin 1"),
-    6: tb("Commissioner", "SOC +1"),
-  },
+		0: tb("Rookie"),
+		1: tb("Corporal", "Streetwise 1"),
+		2: tb("Sergeant"),
+		3: tb("Detective"),
+		4: tb("Lieutenant", "Investigate 1"),
+		5: tb("Chief", "Admin 1"),
+		6: tb("Commissioner", "SOC +1"),
+	},
 	"Intelligence": {
-    0: tb(),
-    1: tb("Agent", "Deception 1"),
-    2: tb("Field Agent", "Investigate 1"),
-    3: tb(),
-    4: tb("Special Agent", "Gun Combat 1"),
-    5: tb("Assistant Director"),
-    6: tb("Director"),
-  },
- 	"Corporate": {
-    0: tb(),
-    1: tb("Agent", "Deception 1"),
-    2: tb("Field Agent", "Investigate 1"),
-    3: tb(),
-    4: tb("Special Agent", "Gun Combat 1"),
-    5: tb("Assistant Director"),
-    6: tb("Director"),
-  },
+		0: tb(),
+		1: tb("Agent", "Deception 1"),
+		2: tb("Field Agent", "Investigate 1"),
+		3: tb(),
+		4: tb("Special Agent", "Gun Combat 1"),
+		5: tb("Assistant Director"),
+		6: tb("Director"),
+	},
+	"Corporate": {
+		0: tb(),
+		1: tb("Agent", "Deception 1"),
+		2: tb("Field Agent", "Investigate 1"),
+		3: tb(),
+		4: tb("Special Agent", "Gun Combat 1"),
+		5: tb("Assistant Director"),
+		6: tb("Director"),
+	},
 };
 Agent.enter = check(INT, 6);
 Agent.advance = {
@@ -54,22 +54,22 @@ Agent.survive = {
 	"Corporate": check("INT", 5),
 }
 Agent.Events = {
-  label: "Agent Events",
-  type: "set",
-  v: ["Disaster!",
-    "Dangerous Investigation",
-    "Successful Missions",
-    "Contact Networks",
-    "Advanced Training",
-    "Life Event. ",
-    "Undercover Mission",
-    "Above the Call of Duty",
-    "Vehicles Specialist",
-    "Friends in High Places",
-    "Conspiracy Discovered",
-  ],
-  p: p_2d6,
-  o: [
+	label: "Agent Events",
+	type: "set",
+	v: ["Disaster!",
+		"Dangerous Investigation",
+		"Successful Missions",
+		"Contact Networks",
+		"Advanced Training",
+		"Life Event. ",
+		"Undercover Mission",
+		"Above the Call of Duty",
+		"Vehicles Specialist",
+		"Friends in High Places",
+		"Conspiracy Discovered",
+	],
+	p: p_2d6,
+	o: [
 		state => enqueue(state, Agent.Mishaps, true),
 		state => enqueue(state, DangerousInvestigation(state), true),
 		state => enqueue(state, TODO("Agent Events " + 3), true),
@@ -83,7 +83,7 @@ Agent.Events = {
 		state => enqueue(state, TODO("Agent Events " + 11), true),
 		state => enqueue(state, TODO("Agent Events " + 12), true),
 	],
-  r: () => {},
+	r: () => { },
 	t: (_, idx) => {
 		return ["Roll on the Mishap Table, but you are not ejected from this career.",
 			"An investigation takes on a dangerous turn.",
@@ -110,8 +110,8 @@ Agent.Mishaps = uniform({
 		"Close to Home",
 		"Injury",
 	],
-  o: Array.from({length: 11}, (x, i) => state => enqueue(state, TODO("Agent Mishaps " + i), true)),
-	r: () => {},
+	o: Array.from({ length: 11 }, (x, i) => state => enqueue(state, TODO("Agent Mishaps " + i), true)),
+	r: () => { },
 	t: (_, idx) => {
 		return [
 			"Severely injured (this is the same as a result of 2 on the Injury Table). Alternatively, roll twice on the Injury Table and take the lower result.",
@@ -135,6 +135,6 @@ function DangerousInvestigation(state) {
 			state => enqueue(state, Agent.Mishaps, true),
 			state => enqueue(state, ChooseSkill("Event Success", ["Deception", "Jack-of-all-Trades", "Persuade", "Tactics"]), true),
 		],
-		r: () => {},
+		r: () => { },
 	};
 }
