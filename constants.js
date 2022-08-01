@@ -84,3 +84,4 @@ const _DRAFTED = "_Drafted";
 const _PRINT = "_print";
 
 const MODIFIERS = '_Modifiers';
+const LOG = '_Log';

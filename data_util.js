@@ -138,3 +138,14 @@ function addModifier(state, roll, val) {
 	}
 	modifiers[roll].append(val);
 }
+
+function getModifiers(state, roll) {
+	if (!state.has(MODIFIERS)) return [];
+	return state.get(MODIFIERS).get(roll);
+}
+
+function addToLog(state, spec, value) {
+	const term = state.get(TERMS);
+	const entry = [spec.label, value, term];
+	append(state, LOG, entry);
+}

@@ -19,6 +19,7 @@ function generator(generatorFunctions) {
 
     const container = dom(log, "c", );
     const label = dom(container, "", spec.label);
+    console.log(randomValue);
     const input = doRender(spec, randomValue);
     container.appendChild(input);
 		const text = dom(container, "");
@@ -32,6 +33,7 @@ function generator(generatorFunctions) {
       state.get("queue").shift();
       doOutcome(state, spec, value);
       spec.r(state);
+      addToLog(state, spec, doValue(spec, value));
       if (spec.debug) {
       	console.log(spec.label, spec.p.map(p => p(state)));
       }
@@ -218,6 +220,9 @@ function renderState(state) {
     return order(a) - order(b);
   });
   for (let [key, value] of data) {
+    if (key == LOG) {
+      continue;
+    }
   	let className = "line"
   	if (key.startsWith("_")) {
     	className += " debug"

@@ -236,27 +236,22 @@ function Advancement(Career, assignments, stats, values) {
 		],
 		o: [
 			state => {
-				enqueue(state, Finish);
-				enqueue(state, Term);
+				const cont = ContinueCareer(Career);
+				addModifier(state, cont.label, 'Leave')
 			},
+			state => {},
 			state => {
-				enqueue(state, ContinueCareer(Career));
-				enqueue(state, Finish);
+				advancementSuccess(state);
 			},
 			state => {
 				advancementSuccess(state);
-				enqueue(state, ContinueCareer(Career));
-				enqueue(state, Finish);
-			},
-			state => {
-				advancementSuccess(state);
-				enqueue(state, Finish);
-				enqueue(state, SkillSet(Career));
-				enqueue(state, Survival(Career));
+				const cont = ContinueCareer(Career);
+				addModifier(state, cont.label, 'Stay')
 			}
 		],
 		r: state => {
-
+			enqueue(state, ContinueCareer(Career));
+			enqueue(state, Finish);
 		},
 	}
 }
@@ -313,12 +308,15 @@ function canCareer(state, career, check) {
 }
 
 function ContinueCareer(Career) {
+	const label = `Continue ${Career.name} Career?`;
 	return {
 		id: 'continue-career-' + Career.name,
-		label: `Continue ${Career.name} Career?`,
+		label: label,
 		type: "set",
 		v: ["Leave", "Stay"],
-		p: [0.2, 0.8].map(val => state => val),
+		p: [0.2, 0.8].map(val => state => {
+			return val;
+		}),
 		o: [
 			state => {
 				getBenefits(state, Career);
