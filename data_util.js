@@ -106,6 +106,10 @@ function parseBenefit(str) {
 	return state => append(state, ASSETS, str);
 }
 
+function previousCareer(state) {
+	return state.get(CAREERS).slice(-2)[1];
+}
+
 function currentCareer(state) {
 	return state.get(CAREERS).slice(-1)[0];
 }
@@ -128,24 +132,12 @@ function isCurrentPreCareer(state) {
 	return PreCareers.some(pre => currentCareer(state).startsWith(pre));
 }
 
-function addModifier(state, roll, val) {
-	if (!state.has(MODIFIERS)) {
-		state.set(MODIFIERS, new Map());
-	}
-	const modifiers = state.get(MODIFIERS);
-	if (!modifiers.has(roll)) {
-		modifiers[roll] = [];
-	}
-	modifiers[roll].append(val);
-}
-
-function getModifiers(state, roll) {
-	if (!state.has(MODIFIERS)) return [];
-	return state.get(MODIFIERS).get(roll);
-}
-
 function addToLog(state, spec, value) {
 	const term = state.get(TERMS);
-	const entry = [spec.label, value, term];
+	const entry = {
+		label: spec.label, 
+		outcome: value, 
+		term: term,
+	};
 	append(state, LOG, entry);
 }

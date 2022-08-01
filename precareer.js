@@ -1,11 +1,12 @@
 function canPreCareer(state, precareer, check) {
-	const terms = state.get("terms");
-  if (terms > 2) return 0;
-  if (state.has(_PRE_CAREER_ATTEMPT(terms))) return 0;
-	if (state.get(CAREERS).includes(_GRAD(precareer, HONORS))
-		|| state.get(CAREERS).includes(_GRAD(precareer, GRAD))) {
-		return 0;
-	}
+	const currentTerm = state.get("terms");
+  if (currentTerm > 2) return 0;
+  const log = state.get(LOG);
+  const prevAttempts = log.filter(e => e.term == currentTerm)
+    .filter(e => e.label.endsWith('Entry'));
+  if (prevAttempts.length > 0) {
+    return 0;
+  }
   return check;
 }
 
@@ -122,9 +123,7 @@ const UniversityEntry = {
       enqueue(state, UniversityGraduation);
     },
   ],
-  r: state => {
-		state.set(_PRE_CAREER_ATTEMPT(state.get("terms")), 1)
-	},
+  r: () => {},
 }
 
 // TODO: DM+1(2) to qualify for Agent, Army, Citizen (corporate), Entertainer(journalist), Marines, Navy, Scholar, Scouts; commission roll

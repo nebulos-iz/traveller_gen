@@ -173,8 +173,7 @@ function Commission(Career) {
 		label: Career.name + " Commission",
 		type: "set",
 		v: ["Failed", "Succeeded"],
-		p: binary(state => check2d6(9 - mod(state.get(SOC)) 
-																	- get(state, _DM_COMMISSION(Career.name)))),
+		p: binary(state => check2d6(9 - mod(state.get(SOC)) - get(state, _DM_COMMISSION(Career.name)))),
 		o: [
 			state => enqueue(state, Advancement(Career)),
 			state => {
@@ -237,7 +236,6 @@ function Advancement(Career, assignments, stats, values) {
 		o: [
 			state => {
 				const cont = ContinueCareer(Career);
-				addModifier(state, cont.label, 'Leave')
 			},
 			state => {},
 			state => {
@@ -246,7 +244,6 @@ function Advancement(Career, assignments, stats, values) {
 			state => {
 				advancementSuccess(state);
 				const cont = ContinueCareer(Career);
-				addModifier(state, cont.label, 'Stay')
 			}
 		],
 		r: state => {
